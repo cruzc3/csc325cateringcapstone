@@ -15,10 +15,12 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 
 public class OrderDetailsController implements Initializable {
@@ -44,11 +46,21 @@ public class OrderDetailsController implements Initializable {
 
         // Set up date picker with min date as tomorrow
         datePicker.setValue(LocalDate.now().plusDays(1));
-        datePicker.setDayCellFactory(picker -> new DateCell() {
+
+        // Set the day cell factory to disable dates before tomorrow
+        datePicker.setDayCellFactory(new Callback<DatePicker, DateCell>() {
             @Override
-            public void updateItem(LocalDate date, boolean empty) {
-                super.updateItem(date, empty);
-                setDisable(empty || date.compareTo(LocalDate.now()) < 1);
+            public DateCell call(DatePicker param) {
+                return new DateCell() {
+                    @Override
+                    public void updateItem(LocalDate date, boolean empty) {
+                        super.updateItem(date, empty);
+
+                        // Disable dates before tomorrow
+                        LocalDate tomorrow = LocalDate.now().plusDays(1);
+                        setDisable(empty || date.compareTo(tomorrow) < 0);
+                    }
+                };
             }
         });
 
@@ -65,7 +77,9 @@ public class OrderDetailsController implements Initializable {
         }
 
         timeComboBox.setItems(availableTimes);
-        timeComboBox.setValue(availableTimes.get(0)); // Default to first available time
+        if (!availableTimes.isEmpty()) {
+            timeComboBox.setValue(availableTimes.get(0)); // Default to first available time
+        }
     }
 
     /**
@@ -84,6 +98,10 @@ public class OrderDetailsController implements Initializable {
      * Update the UI with the current order details
      */
     private void updateOrderDetails() {
+        if (currentOrder == null) {
+            return;
+        }
+
         // Set the total
         totalLabel.setText("Total: " + currentOrder.getFormattedTotal());
 
@@ -168,5 +186,4 @@ public class OrderDetailsController implements Initializable {
     public boolean isOrderPlaced() {
         return orderPlaced;
     }
-
 }

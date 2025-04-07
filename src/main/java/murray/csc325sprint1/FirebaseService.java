@@ -1,8 +1,6 @@
 package murray.csc325sprint1;
 
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
@@ -10,15 +8,16 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
+/**
+ * Service for interacting with Firebase Firestore database
+ */
 public class FirebaseService {
     private static FirebaseService instance;
     private Firestore db;
@@ -49,8 +48,12 @@ public class FirebaseService {
         try {
             // Load Firebase configuration from the key.json file
             InputStream serviceAccount = getClass().getResourceAsStream("/key.json");
+            if (serviceAccount == null) {
+                System.err.println("Could not find key.json file");
+                return;
+            }
 
-            FirebaseOptions options = new FirebaseOptions.Builder()
+            FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .setDatabaseUrl("https://csc325capstone-1054a.firebaseio.com")
                     .build();
@@ -84,6 +87,11 @@ public class FirebaseService {
      */
     public void setupMenuItems() {
         try {
+            if (db == null) {
+                System.err.println("Firestore not initialized");
+                return;
+            }
+
             // Check if menu collection already has items
             QuerySnapshot menuQuery = db.collection(MENU_COLLECTION).limit(1).get().get();
 
@@ -101,11 +109,6 @@ public class FirebaseService {
             addMenuItem("Pulled Pork Sliders", 60.0, "Smoky BBQ pulled pork topped with coleslaw, served in soft brioche buns", "appetizer", "dozen");
             addMenuItem("Caprese Skewers", 36.0, "Fresh mozzarella, cherry tomatoes, and basil leaves drizzled with a tangy balsamic glaze", "appetizer", "dozen");
             addMenuItem("Vegan Spring Rolls", 42.0, "Fresh vegetable-filled rice paper rolls served with peanut or sweet chili sauce", "appetizer", "dozen");
-
-            // Add menu items from the menu document
-            addMenuItem("Mediterranean Mezze Platter", 65.0, "A vibrant assortment of hummus, baba ganoush, tzatziki, marinated olives, feta cheese, and stuffed grape leaves, served with warm pita triangles and crisp vegetable crudités.", "appetizer", "platter");
-            addMenuItem("Bacon-Wrapped Dates", 45.0, "Sweet Medjool dates stuffed with creamy goat cheese and wrapped in applewood-smoked bacon, drizzled with balsamic reduction and garnished with fresh herbs.", "appetizer", "order");
-            addMenuItem("Wild Mushroom Arancini", 55.0, "Crispy risotto balls filled with wild mushrooms, fontina cheese, and white truffle oil, served with roasted garlic aioli and topped with shaved Parmesan.", "appetizer", "order");
 
             // Add entrees
             addMenuItem("Rosemary-Garlic Prime Rib", 225.0, "Slow-roasted prime rib crusted with fresh rosemary, garlic, and cracked black pepper, served with au jus, horseradish cream, and Yorkshire pudding.", "entree", "order");
@@ -161,17 +164,24 @@ public class FirebaseService {
         List<MenuItem> menuItems = new ArrayList<>();
 
         try {
+            if (db == null) {
+                System.err.println("Firestore not initialized");
+                return menuItems;
+            }
+
             QuerySnapshot querySnapshot = db.collection(MENU_COLLECTION).get().get();
 
             for (QueryDocumentSnapshot document : querySnapshot.getDocuments()) {
                 String name = document.getString("name");
-                double price = document.getDouble("price");
+                Double price = document.getDouble("price");
                 String description = document.getString("description");
                 String category = document.getString("category");
                 String unit = document.getString("unit");
 
-                MenuItem item = new MenuItem(name, price, description, category, unit);
-                menuItems.add(item);
+                if (name != null && price != null && description != null && category != null && unit != null) {
+                    MenuItem item = new MenuItem(name, price, description, category, unit);
+                    menuItems.add(item);
+                }
             }
 
         } catch (Exception e) {
@@ -192,6 +202,11 @@ public class FirebaseService {
         List<MenuItem> menuItems = new ArrayList<>();
 
         try {
+            if (db == null) {
+                System.err.println("Firestore not initialized");
+                return menuItems;
+            }
+
             QuerySnapshot querySnapshot = db.collection(MENU_COLLECTION)
                     .whereEqualTo("category", category)
                     .get()
@@ -199,12 +214,14 @@ public class FirebaseService {
 
             for (QueryDocumentSnapshot document : querySnapshot.getDocuments()) {
                 String name = document.getString("name");
-                double price = document.getDouble("price");
+                Double price = document.getDouble("price");
                 String description = document.getString("description");
                 String unit = document.getString("unit");
 
-                MenuItem item = new MenuItem(name, price, description, category, unit);
-                menuItems.add(item);
+                if (name != null && price != null && description != null && unit != null) {
+                    MenuItem item = new MenuItem(name, price, description, category, unit);
+                    menuItems.add(item);
+                }
             }
 
         } catch (Exception e) {
@@ -223,6 +240,11 @@ public class FirebaseService {
      */
     public boolean saveOrder(Order order) {
         try {
+            if (db == null) {
+                System.err.println("Firestore not initialized");
+                return false;
+            }
+
             // Generate a unique order ID if not provided
             if (order.getOrderId() == null || order.getOrderId().isEmpty()) {
                 order.setOrderId(UUID.randomUUID().toString());

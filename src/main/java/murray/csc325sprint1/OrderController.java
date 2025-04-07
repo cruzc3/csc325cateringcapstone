@@ -3,7 +3,6 @@ package murray.csc325sprint1;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -187,8 +186,18 @@ public class OrderController implements Initializable {
                 return;
             }
 
+            // Try to load the dialog from different possible paths
+            URL fxmlLocation = getClass().getResource("/fxml/OrderDetailsDialog.fxml");
+            if (fxmlLocation == null) {
+                fxmlLocation = getClass().getResource("/murray/csc325sprint1/OrderDetailsDialog.fxml");
+            }
+
+            if (fxmlLocation == null) {
+                throw new IOException("Could not find OrderDetailsDialog.fxml");
+            }
+
             // Load the order details dialog
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/OrderDetailsDialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
 
             // Get the controller and pass the current order
@@ -224,5 +233,4 @@ public class OrderController implements Initializable {
             alert.showAndWait();
         }
     }
-
 }
