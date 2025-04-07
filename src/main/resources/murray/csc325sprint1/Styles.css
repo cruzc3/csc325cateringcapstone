@@ -1,0 +1,86 @@
+.root {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-background-color: white;
+}
+
+/* Category header */
+.category-header {
+    -fx-font-size: 24px;
+    -fx-text-fill: #888888;
+    -fx-background-color: #F0F0F0;
+    -fx-padding: 10px;
+}
+
+/* Add button */
+.add-button {
+    -fx-background-radius: 15px;
+    -fx-background-color: white;
+    -fx-border-color: #CCCCCC;
+    -fx-border-radius: 15px;
+    -fx-min-width: 30px;
+    -fx-min-height: 30px;
+    -fx-max-width: 30px;
+    -fx-max-height: 30px;
+}
+
+.add-button:hover {
+    -fx-background-color: #f0f0f0;
+}
+
+.add-button:pressed {
+    -fx-background-color: #e0e0e0;
+}
+
+/* Place order button */
+.place-order-button {
+    -fx-background-color: #CCCCCC;
+    -fx-font-size: 14px;
+    -fx-min-height: 40px;
+    -fx-min-width: 120px;
+}
+
+.place-order-button:hover {
+    -fx-background-color: #b0b0b0;
+}
+
+/* Close button */
+.close-button {
+    -fx-background-color: transparent;
+    -fx-font-size: 18px;
+}
+
+.close-button:hover {
+    -fx-text-fill: red;
+}
+
+/* ScrollPane */
+.scroll-pane {
+    -fx-background-color: white;
+    -fx-border-color: #CCCCCC;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: white;
+}
+
+/* Date picker & time combo box */
+.date-picker,
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #CCCCCC;
+    -fx-border-radius: 3px;
+}
+
+.date-picker:focused,
+.combo-box:focused {
+    -fx-border-color: #888888;
+}
+
+/* Cart button */
+.cart-button {
+    -fx-background-color: transparent;
+}
+
+.cart-button:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 0);
+}
