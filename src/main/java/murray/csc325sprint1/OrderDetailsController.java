@@ -34,15 +34,15 @@ public class OrderDetailsController implements Initializable {
 
     private Order currentOrder;
     private boolean orderPlaced = false;
-    private FirebaseService firebaseService;
+    private OrderService orderService;
 
     /**
      * Initialize the controller
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Initialize Firebase service
-        firebaseService = FirebaseService.getInstance();
+        // Get the order service from MainApp
+        orderService = MainApp.getOrderService();
 
         // Set up date picker with min date as tomorrow
         datePicker.setValue(LocalDate.now().plusDays(1));
@@ -142,8 +142,8 @@ public class OrderDetailsController implements Initializable {
         currentOrder.setPickupDate(datePicker.getValue().toString());
         currentOrder.setPickupTime(timeComboBox.getValue());
 
-        // Save the order to Firebase
-        boolean success = firebaseService.saveOrder(currentOrder);
+        // Save the order
+        boolean success = orderService.saveOrder(currentOrder);
 
         if (success) {
             // Mark the order as placed

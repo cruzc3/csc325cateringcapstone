@@ -18,7 +18,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -31,40 +30,40 @@ public class OrderController implements Initializable {
     @FXML private Button cartBtn;
 
     private Order currentOrder;
-    private FirebaseService firebaseService;
+    private Menu menuService;
 
     /**
      * Initialize the controller
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Initialize Firebase service
-        firebaseService = FirebaseService.getInstance();
+        // Get the menu from MainApp
+        menuService = MainApp.getMenu();
 
         // Initialize the current order
         currentOrder = new Order();
 
-        // Load menu items from Firebase
+        // Load menu items
         loadMenuItems();
     }
 
     /**
-     * Load menu items from Firebase and display them
+     * Load menu items and display them
      */
     private void loadMenuItems() {
         // Clear existing menu items
         menuContainer.getChildren().clear();
 
         // Get appetizers
-        List<MenuItem> appetizers = firebaseService.getMenuItemsByCategory("appetizer");
+        List<MenuItem> appetizers = menuService.getMenuItemsByCategory("appetizer");
         addCategoryToMenu("Appetizers", appetizers);
 
         // Get entrees
-        List<MenuItem> entrees = firebaseService.getMenuItemsByCategory("entree");
+        List<MenuItem> entrees = menuService.getMenuItemsByCategory("entree");
         addCategoryToMenu("Entrees", entrees);
 
         // Get desserts
-        List<MenuItem> desserts = firebaseService.getMenuItemsByCategory("dessert");
+        List<MenuItem> desserts = menuService.getMenuItemsByCategory("dessert");
         addCategoryToMenu("Desserts", desserts);
     }
 

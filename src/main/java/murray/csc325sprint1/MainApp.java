@@ -14,14 +14,15 @@ import java.net.URL;
  */
 public class MainApp extends Application {
 
+    // These will be created as needed by controllers
+    private static Menu menu;
+    private static OrderService orderService;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         try {
-            // Initialize Firebase service
-            FirebaseService.getInstance().initializeFirebase();
-
-            // Set up menu items in Firebase if they don't exist
-            FirebaseService.getInstance().setupMenuItems();
+            // Create menu and initialize menu items
+            menu = new Menu();
 
             // Attempt both resource paths to find the correct one
             URL fxmlLocation = getClass().getResource("/fxml/OrderView.fxml");
@@ -63,6 +64,30 @@ public class MainApp extends Application {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    /**
+     * Get the menu instance
+     *
+     * @return The menu
+     */
+    public static Menu getMenu() {
+        if (menu == null) {
+            menu = new Menu();
+        }
+        return menu;
+    }
+
+    /**
+     * Get the order service instance
+     *
+     * @return The order service
+     */
+    public static OrderService getOrderService() {
+        if (orderService == null) {
+            orderService = new OrderService();
+        }
+        return orderService;
     }
 
     /**

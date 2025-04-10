@@ -1,85 +1,27 @@
 package murray.csc325sprint1;
 
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.cloud.FirestoreClient;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 /**
- * Service for interacting with Firebase Firestore database
+ * Class for managing menu items in the application
  */
-public class FirebaseService {
-    private static FirebaseService instance;
+public class Menu {
     private Firestore db;
-
     private static final String MENU_COLLECTION = "menu_items";
-    private static final String ORDERS_COLLECTION = "orders";
 
-    private FirebaseService() {
-        // Private constructor to enforce singleton pattern
-    }
-
-    /**
-     * Get the singleton instance of FirebaseService
-     *
-     * @return FirebaseService instance
-     */
-    public static FirebaseService getInstance() {
-        if (instance == null) {
-            instance = new FirebaseService();
-        }
-        return instance;
-    }
-
-    /**
-     * Initialize Firebase with the credentials from key.json
-     */
-    public void initializeFirebase() {
-        try {
-            // Load Firebase configuration from the key.json file
-            InputStream serviceAccount = getClass().getResourceAsStream("/key.json");
-            if (serviceAccount == null) {
-                System.err.println("Could not find key.json file");
-                return;
-            }
-
-            FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .setDatabaseUrl("https://csc325capstone-1054a.firebaseio.com")
-                    .build();
-
-            // Initialize Firebase if not already initialized
-            if (FirebaseApp.getApps().isEmpty()) {
-                FirebaseApp.initializeApp(options);
-            }
-
-            // Get Firestore instance
-            db = FirestoreClient.getFirestore();
-
-            System.out.println("Firebase initialized successfully");
-        } catch (Exception e) {
-            System.err.println("Error initializing Firebase: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Get the Firestore database instance
-     *
-     * @return Firestore instance
-     */
-    public Firestore getFirestore() {
-        return db;
+    public Menu() {
+        // Get Firestore instance
+        db = new FirestoreContext().firebase();
+        // Set up menu items
+        setupMenuItems();
     }
 
     /**
@@ -160,7 +102,7 @@ public class FirebaseService {
      *
      * @return List of MenuItem objects
      */
-    public List<MenuItem> getMenuItems() {
+    public List<MenuItem> getAllMenuItems() {
         List<MenuItem> menuItems = new ArrayList<>();
 
         try {
@@ -224,52 +166,11 @@ public class FirebaseService {
                 }
             }
 
-        } catch (Exception e) {
+        } catch (InterruptedException | ExecutionException e) {
             System.err.println("Error getting menu items by category: " + e.getMessage());
             e.printStackTrace();
         }
 
         return menuItems;
-    }
-
-    /**
-     * Save an order to Firebase
-     *
-     * @param order Order object to save
-     * @return true if the order was saved successfully, false otherwise
-     */
-    public boolean saveOrder(Order order) {
-        try {
-            if (db == null) {
-                System.err.println("Firestore not initialized");
-                return false;
-            }
-
-            // Generate a unique order ID if not provided
-            if (order.getOrderId() == null || order.getOrderId().isEmpty()) {
-                order.setOrderId(UUID.randomUUID().toString());
-            }
-
-            // Convert order to a map for Firestore
-            Map<String, Object> orderMap = new HashMap<>();
-            orderMap.put("orderId", order.getOrderId());
-            orderMap.put("orderItems", order.getOrderItems());
-            orderMap.put("orderTotal", order.getOrderTotal());
-            orderMap.put("pickupDate", order.getPickupDate());
-            orderMap.put("pickupTime", order.getPickupTime());
-            orderMap.put("orderStatus", order.getOrderStatus());
-            orderMap.put("orderTimestamp", System.currentTimeMillis());
-
-            // Save to Firestore
-            db.collection(ORDERS_COLLECTION).document(order.getOrderId()).set(orderMap).get();
-
-            System.out.println("Order saved successfully with ID: " + order.getOrderId());
-            return true;
-
-        } catch (Exception e) {
-            System.err.println("Error saving order: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
     }
 }
