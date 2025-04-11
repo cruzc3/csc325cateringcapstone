@@ -7,12 +7,17 @@
     <groupId>murray.csc325sprint1</groupId>
     <artifactId>cak-catering</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>CAK Catering</name>
+    <description>A JavaFX application for managing catering orders</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <javafx.version>17.0.2</javafx.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <javafx.version>17.0.6</javafx.version>
+        <firebase.version>9.1.1</firebase.version>
     </properties>
 
     <dependencies>
@@ -32,60 +37,28 @@
         <dependency>
             <groupId>com.google.firebase</groupId>
             <artifactId>firebase-admin</artifactId>
-            <version>9.1.1</version>
-            <exclusions>
-                <!-- Exclude dependencies that might conflict with our module system -->
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.grpc</groupId>
-                    <artifactId>grpc-api</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>${firebase.version}</version>
         </dependency>
 
-        <!-- Firebase required dependencies -->
+        <!-- For handling JSON -->
         <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-firestore</artifactId>
-            <version>3.7.10</version>
-            <exclusions>
-                <!-- Exclude dependencies that might conflict with our module system -->
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.grpc</groupId>
-                    <artifactId>grpc-api</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
         </dependency>
 
+        <!-- Testing dependencies -->
         <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-core</artifactId>
-            <version>2.8.27</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.9.2</version>
+            <scope>test</scope>
         </dependency>
-
         <dependency>
-            <groupId>com.google.api</groupId>
-            <artifactId>api-common</artifactId>
-            <version>2.2.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.auth</groupId>
-            <artifactId>google-auth-library-oauth2-http</artifactId>
-            <version>1.16.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.auth</groupId>
-            <artifactId>google-auth-library-credentials</artifactId>
-            <version>1.16.0</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.9.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -112,7 +85,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Maven Shade Plugin for creating fat JAR -->
+            <!-- Maven Shade Plugin for creating an executable JAR with dependencies -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -129,43 +102,23 @@
                                     <mainClass>murray.csc325sprint1.MainApp</mainClass>
                                 </transformer>
                             </transformers>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
 
-            <!-- Copy key.json to resources -->
+            <!-- Maven Surefire Plugin for running tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-firebase-key</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.basedir}</directory>
-                                    <includes>
-                                        <include>key.json</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0</version>
             </plugin>
         </plugins>
 
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
+                <filtering>false</filtering>
             </resource>
         </resources>
     </build>
