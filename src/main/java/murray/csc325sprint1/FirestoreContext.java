@@ -6,6 +6,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 
@@ -15,8 +16,8 @@ public class FirestoreContext {
         try {
             // Check if Firebase is already initialized to avoid multiple instances
             if (FirebaseApp.getApps().isEmpty()) {
-                InputStream serviceAccount =
-                        getClass().getResourceAsStream("src/main/resources/murray/csc325/sprint1/key.json");
+                FileInputStream serviceAccount =
+                        new FileInputStream("src/main/resources/murray/csc325sprint1/key.json");
 
                 FirebaseOptions options = FirebaseOptions.builder()
                         .setCredentials(GoogleCredentials.fromStream(serviceAccount))
