@@ -11,4 +11,6 @@ module murray.csc325sprint1 {
     // Open package to FXML
     opens murray.csc325sprint1 to javafx.fxml;
     exports murray.csc325sprint1;
+    exports murray.csc325sprint1.auth;
+    opens murray.csc325sprint1.auth to javafx.fxml;
 }
