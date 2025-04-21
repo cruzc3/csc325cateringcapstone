@@ -31,6 +31,7 @@ public class OrderDetailsController implements Initializable {
     @FXML private ComboBox<String> timeComboBox;
     @FXML private Button placeOrderButton;
     @FXML private Button closeButton;
+    @FXML private Label availabilityLabel; // New label to show availability info
 
     private Order currentOrder;
     private boolean orderPlaced = false;
@@ -65,6 +66,17 @@ public class OrderDetailsController implements Initializable {
         });
 
         // Set up time combo box with available times (9 AM - 7 PM in 30-min intervals)
+        setupTimeComboBox();
+
+        // Add listeners to update availability info when date or time changes
+        datePicker.valueProperty().addListener((obs, oldVal, newVal) -> updateAvailabilityInfo());
+        timeComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateAvailabilityInfo());
+    }
+
+    /**
+     * Set up the time combo box with available times
+     */
+    private void setupTimeComboBox() {
         ObservableList<String> availableTimes = FXCollections.observableArrayList();
         LocalTime startTime = LocalTime.of(9, 0);
         LocalTime endTime = LocalTime.of(19, 0);
@@ -83,6 +95,43 @@ public class OrderDetailsController implements Initializable {
     }
 
     /**
+     * Update the availability information displayed to the user
+     */
+    private void updateAvailabilityInfo() {
+        if (datePicker.getValue() == null || timeComboBox.getValue() == null) {
+            return;
+        }
+
+        String date = datePicker.getValue().toString();
+        String time = timeComboBox.getValue();
+
+        try {
+            int currentCount = orderService.countOrdersInTimeSlot(date, time);
+            int maxOrders = orderService.getMaxOrdersPerTimeSlot();
+            int remainingSlots = maxOrders - currentCount;
+
+            if (availabilityLabel != null) {
+                if (remainingSlots > 0) {
+                    availabilityLabel.setText("Available slots: " + remainingSlots + " of " + maxOrders);
+                    availabilityLabel.setStyle("-fx-text-fill: green;");
+                } else {
+                    availabilityLabel.setText("This time slot is fully booked. Please select another time.");
+                    availabilityLabel.setStyle("-fx-text-fill: red;");
+                }
+            }
+
+            // Enable or disable the place order button based on availability
+            if (placeOrderButton != null) {
+                placeOrderButton.setDisable(remainingSlots <= 0);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error updating availability info: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Set the order to display in this dialog
      *
      * @param order The order to display
@@ -92,6 +141,9 @@ public class OrderDetailsController implements Initializable {
 
         // Update the UI with order details
         updateOrderDetails();
+
+        // Update availability info for the default date/time
+        updateAvailabilityInfo();
     }
 
     /**
@@ -142,17 +194,30 @@ public class OrderDetailsController implements Initializable {
         currentOrder.setPickupDate(datePicker.getValue().toString());
         currentOrder.setPickupTime(timeComboBox.getValue());
 
-        // Save the order
-        boolean success = orderService.saveOrder(currentOrder);
+        // Check if the time slot is available
+        try {
+            if (!orderService.isTimeSlotAvailable(currentOrder.getPickupDate(), currentOrder.getPickupTime())) {
+                showError("This time slot is fully booked. Please select another time.");
+                updateAvailabilityInfo(); // Refresh the availability display
+                return;
+            }
 
-        if (success) {
-            // Mark the order as placed
-            orderPlaced = true;
+            // Save the order
+            boolean success = orderService.saveOrder(currentOrder);
 
-            // Close the dialog
-            closeDialog(null);
-        } else {
-            showError("Failed to place order. Please try again.");
+            if (success) {
+                // Mark the order as placed
+                orderPlaced = true;
+
+                // Close the dialog
+                closeDialog(null);
+            } else {
+                showError("Failed to place order. The time slot may have been filled by another customer. Please try again.");
+                updateAvailabilityInfo(); // Refresh the availability display
+            }
+        } catch (Exception e) {
+            showError("Error placing order: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
