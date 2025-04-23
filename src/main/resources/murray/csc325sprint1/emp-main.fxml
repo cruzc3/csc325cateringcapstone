@@ -7,35 +7,34 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="537.0" prefWidth="778.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="537.0" prefWidth="778.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="murray.csc325sprint1.EmployeeMainController">
    <children>
       <ImageView fitHeight="537.0" fitWidth="389.0" layoutX="389.0" pickOnBounds="true" smooth="false">
          <image>
-            <Image url="@../../images/Employee%20Homescreen%20IMG.png" />
+            <Image url="@../../images/EmployeeHomescreen.png" />
          </image>
       </ImageView>
-      <Button layoutX="30.0" layoutY="122.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="139.0" text="Schedule">
+      <Button fx:id="EmpSchedule" layoutX="30.0" layoutY="122.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="139.0" text="Schedule">
          <font>
             <Font size="14.0" />
          </font>
       </Button>
-      <Button layoutX="30.0" layoutY="202.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="139.0" text="Inventory">
+      <Button fx:id="EmpInventory" layoutX="30.0" layoutY="202.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="139.0" text="Inventory">
          <font>
             <Font size="14.0" />
          </font>
       </Button>
-      <Button layoutX="30.0" layoutY="280.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="139.0" text="Orders">
+      <Button fx:id="EmpOrders" layoutX="30.0" layoutY="280.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="139.0" text="Orders">
          <font>
             <Font size="14.0" />
          </font>
       </Button>
-      <Button layoutX="30.0" layoutY="357.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="139.0" text="Contact">
+      <Button fx:id="EmpContact" layoutX="30.0" layoutY="357.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="139.0" text="Contact">
          <font>
             <Font size="14.0" />
          </font>
       </Button>
-      <Button layoutX="30.0" layoutY="440.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="139.0" text="Log Out">
+      <Button fx:id="EmpLogOut" layoutX="30.0" layoutY="440.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="139.0" text="Log Out">
          <font>
             <Font size="14.0" />
          </font>

@@ -7,6 +7,7 @@ module murray.csc325sprint1 {
     requires google.cloud.firestore;
     requires google.cloud.core;
     requires com.google.api.apicommon;
+    requires java.desktop;
 
     // Open package to FXML
     opens murray.csc325sprint1 to javafx.fxml;

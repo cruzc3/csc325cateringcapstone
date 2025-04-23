@@ -1,16 +1,25 @@
 package murray.csc325sprint1;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 
-public class EmployeeMainController extends Application {
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+public class EmployeeMainController  {
 
-    @Override
-    public void start(Stage primaryStage) {
+    @FXML
+    private Button EmpContact;
 
-    }
+    @FXML
+    private Button EmpInventory;
+
+    @FXML
+    private Button EmpLogOut;
+
+    @FXML
+    private Button EmpOrders;
+
+    @FXML
+    private Button EmpSchedule;
+
 }
+
