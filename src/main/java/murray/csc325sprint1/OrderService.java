@@ -20,8 +20,8 @@ public class OrderService {
      * Constructor - initializes Firestore
      */
     public OrderService() {
-        // Get Firestore instance
-        db = new FirestoreContext().firebase();
+        // Get Firestore instance using singleton
+        db = FirestoreContext.getInstance().getFirestore();
     }
 
     /**

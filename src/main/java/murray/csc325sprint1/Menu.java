@@ -18,8 +18,8 @@ public class Menu {
     private static final String MENU_COLLECTION = "menu_items";
 
     public Menu() {
-        // Get Firestore instance
-        db = new FirestoreContext().firebase();
+        // Get Firestore instance using singleton
+        db = FirestoreContext.getInstance().getFirestore();
         // Set up menu items
         setupMenuItems();
     }
