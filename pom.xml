@@ -16,6 +16,12 @@
     </properties>
 
     <dependencies>
+        <!-- Add dotenv dependency -->
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>2.3.2</version>
+        </dependency>
 
         <dependency>
             <groupId>io.grpc</groupId>
@@ -162,25 +168,25 @@
                 </executions>
             </plugin>
 
-            <!-- Copy key.json to resources -->
+            <!-- Copy config directory to target -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.3.0</version>
                 <executions>
                     <execution>
-                        <id>copy-firebase-key</id>
+                        <id>copy-config</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                            <outputDirectory>${project.build.outputDirectory}/config</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.basedir}</directory>
+                                    <directory>${project.basedir}/config</directory>
                                     <includes>
-                                        <include>key.json</include>
+                                        <include>.env.example</include>
                                     </includes>
                                 </resource>
                             </resources>
