@@ -1,9 +1,8 @@
 package murray.csc325sprint1.auth;
 
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.firestore.Firestore;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
 import com.google.firebase.auth.*;
-import com.google.firebase.cloud.FirestoreClient;
 import murray.csc325sprint1.FirestoreContext;
 
 import java.util.HashMap;
@@ -19,41 +18,47 @@ public class AuthService {
         this.db = new FirestoreContext().firebase();
     }
 
-    public boolean register(String email, String password, String fullName) {
-        try {
-            // 1. Create Firebase authentication user
-            UserRecord.CreateRequest request = new UserRecord.CreateRequest()
-                    .setEmail(email)
-                    .setPassword(password);
-            UserRecord userRecord = auth.createUser(request);
-
-            // 2. Store additional user data in Firestore
-            Map<String, Object> userData = new HashMap<>();
-            userData.put("email", email);
-            userData.put("fullName", fullName);
-            userData.put("createdAt", System.currentTimeMillis());
-            userData.put("role", "customer"); // Default role
-
-            // 3. Save to "users" collection with UID as document ID
-            db.collection("users").document(userRecord.getUid())
-                    .set(userData)
-                    .get(); // Wait for completion
-
-            return true;
-        } catch (FirebaseAuthException | InterruptedException | ExecutionException e) {
-            System.err.println("Registration failed: " + e.getMessage());
-            return false;
-        }
+    public boolean isUsernameAvailable(String username) throws ExecutionException, InterruptedException {
+        ApiFuture<QuerySnapshot> query = db.collection("usernames")
+                .whereEqualTo("username", username.toLowerCase())
+                .get();
+        return query.get().isEmpty();
     }
 
-    public boolean login(String email, String password) {
-        try {
-            // In a real implementation, you would use signInWithEmailAndPassword
-            // This is simplified for demonstration
-            UserRecord user = auth.getUserByEmail(email);
-            return user != null;
-        } catch (FirebaseAuthException e) {
-            return false;
+    public UserRecord register(String email, String password, String username,
+                               String fullName, String userType)
+            throws FirebaseAuthException, ExecutionException, InterruptedException {
+
+        if (!isUsernameAvailable(username)) {
+            throw new IllegalArgumentException("Username is already taken");
         }
+
+        // Create auth user
+        UserRecord.CreateRequest request = new UserRecord.CreateRequest()
+                .setEmail(email)
+                .setPassword(password);
+        UserRecord userRecord = auth.createUser(request);
+
+        // Store additional info in Firestore
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("email", email);
+        userData.put("username", username);
+        userData.put("fullName", fullName);
+        userData.put("userType", userType);
+
+        db.collection("users").document(userRecord.getUid()).set(userData).get();
+
+        // Reserve username
+        Map<String, Object> usernameData = new HashMap<>();
+        usernameData.put("username", username.toLowerCase());
+        usernameData.put("userId", userRecord.getUid());
+        db.collection("usernames").document(username.toLowerCase()).set(usernameData).get();
+
+        return userRecord;
+    }
+
+    public UserRecord login(String email, String password) throws FirebaseAuthException {
+        // In real app, use signInWithEmailAndPassword
+        return auth.getUserByEmail(email);
     }
 }

@@ -26,8 +26,10 @@
         </children>
     </GridPane>
 
-    <HBox alignment="CENTER" spacing="10.0">
-        <Button text="Login" onAction="#handleLogin" defaultButton="true"/>
-        <Button text="Register" onAction="#handleRegisterRedirect"/>
+    <Button text="Sign In" onAction="#handleLogin" defaultButton="true"/>
+
+    <HBox alignment="CENTER" spacing="5.0">
+        <Label text="Don't have an account?"/>
+        <Button text="Register" onAction="#handleRegisterRedirect" style="-fx-background-color: transparent; -fx-text-fill: blue; -fx-underline: true;"/>
     </HBox>
 </VBox>

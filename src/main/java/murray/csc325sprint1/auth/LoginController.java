@@ -1,5 +1,7 @@
 package murray.csc325sprint1.auth;
 
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.UserRecord;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
@@ -10,32 +12,39 @@ public class LoginController {
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
 
+    private final AccessDataView accessDataView = new AccessDataView();
     private final AuthService authService = new AuthService();
 
     @FXML
+    private void initialize() {
+        // Bind view properties to model
+        emailField.textProperty().bindBidirectional(accessDataView.emailProperty());
+        passwordField.textProperty().bindBidirectional(accessDataView.passwordProperty());
+    }
+
+    @FXML
     private void handleLogin() {
-        String email = emailField.getText();
-        String password = passwordField.getText();
+        try {
+            UserRecord user = authService.login(
+                    accessDataView.emailProperty().get(),
+                    accessDataView.passwordProperty().get()
+            );
 
-        if (email.isEmpty() || password.isEmpty()) {
-            showAlert("Error", "Please enter both email and password");
-            return;
-        }
+            showAlert("Success", "Logged in successfully!");
+            MainApp.setRoot("views/LoggedInView");
 
-        if (authService.login(email, password)) {
-            MainApp.setRoot("OrderView.fxml");
-        } else {
-            showAlert("Login Failed", "Invalid credentials");
+        } catch (FirebaseAuthException e) {
+            showAlert("Login Failed", e.getMessage());
         }
     }
 
     @FXML
     private void handleRegisterRedirect() {
-        MainApp.setRoot("register.fxml");
+        MainApp.setRoot("views/register");
     }
 
     private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
