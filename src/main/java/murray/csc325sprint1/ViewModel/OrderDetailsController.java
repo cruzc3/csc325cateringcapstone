@@ -1,4 +1,4 @@
-package murray.csc325sprint1;
+package murray.csc325sprint1.ViewModel;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -21,6 +21,9 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import murray.csc325sprint1.MainApp;
+import murray.csc325sprint1.Order;
+import murray.csc325sprint1.OrderService;
 
 
 public class OrderDetailsController implements Initializable {

@@ -1,4 +1,4 @@
-package murray.csc325sprint1;
+package murray.csc325sprint1.ViewModel;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

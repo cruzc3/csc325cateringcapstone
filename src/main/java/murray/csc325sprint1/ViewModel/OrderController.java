@@ -1,4 +1,4 @@
-package murray.csc325sprint1;
+package murray.csc325sprint1.ViewModel;
 
 import java.io.IOException;
 import java.net.URL;
@@ -23,6 +23,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import murray.csc325sprint1.*;
 
 public class OrderController implements Initializable {
 
