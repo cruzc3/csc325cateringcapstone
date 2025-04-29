@@ -1,16 +1,18 @@
 package murray.csc325sprint1;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 
-public class CustomerContactController extends Application {
+public class CustomerContactController {
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+    @FXML
+    private TextField EnterMessage;
 
-    @Override
-    public void start(Stage primaryStage) {
+    @FXML
+    private TextField EnterSubject;
 
-    }
+    @FXML
+    private Button viewRequest;
+
 }
