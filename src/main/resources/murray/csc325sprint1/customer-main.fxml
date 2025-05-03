@@ -22,7 +22,7 @@
                 <Image url="@../../images/EmployeeHomescreen.png" />
             </image>
         </ImageView>
-        <Button fx:id="cusOrder" layoutX="30.0" layoutY="109.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="139.0" style="-fx-background-color: #ffffff; -fx-border-color: #000000;" text="Order" textAlignment="JUSTIFY" textFill="#8a8a8a">
+        <Button fx:id="cusOrder" layoutX="30.0" layoutY="109.0" mnemonicParsing="false" onAction="#setCusOrder" prefHeight="55.0" prefWidth="139.0" style="-fx-background-color: #ffffff; -fx-border-color: #000000;" text="Order" textAlignment="JUSTIFY" textFill="#8a8a8a">
             <font>
                 <Font size="18.0" />
             </font>
