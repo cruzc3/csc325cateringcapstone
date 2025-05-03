@@ -85,13 +85,6 @@ public class TermsAndConditionsController {
         if (createUserController != null) {
             createUserController.userAgreedToTerms();
         }
-        try {
-            GridPane signUpGridPane = FXMLLoader.load(getClass().getResource(murray.csc325sprint1.Model.ViewPaths.CREATE_USER_SCREEN));
-            instance.clearContent();
-            instance.initScreenBorderPane.setCenter(signUpGridPane);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
     }
 

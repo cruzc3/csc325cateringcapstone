@@ -5,6 +5,7 @@ import java.util.Objects;
 public class User {
 
     private String fName,lName,email,secQuestion,secAnswer,password;
+    private boolean employee;
 
     public User(String fName, String lName, String email, String secQuestion, String secAnswer, String password) {
         this.fName = fName;
@@ -13,6 +14,7 @@ public class User {
         this.secQuestion = secQuestion;
         this.secAnswer = secAnswer;
         this.password = password;
+        this.employee = false;
     }
 
     public String getfName() {
@@ -63,6 +65,14 @@ public class User {
         this.password = password;
     }
 
+    public boolean isEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(boolean employee) {
+        this.employee = employee;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -86,5 +96,4 @@ public class User {
                 ", password='" + password + '\'' +
                 '}';
     }
-
 }

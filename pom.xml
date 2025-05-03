@@ -16,6 +16,12 @@
     </properties>
 
     <dependencies>
+        <!-- BCrypt password hashing -->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
         <!-- Add dotenv dependency -->
         <dependency>
             <groupId>io.github.cdimascio</groupId>
@@ -120,6 +126,7 @@
             <artifactId>google-auth-library-credentials</artifactId>
             <version>1.16.0</version>
         </dependency>
+
     </dependencies>
 
     <build>

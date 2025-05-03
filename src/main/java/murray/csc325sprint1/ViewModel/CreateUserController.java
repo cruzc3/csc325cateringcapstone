@@ -13,13 +13,19 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import murray.csc325sprint1.Model.SecurityQuestion;
-import murray.csc325sprint1.Model.ViewPaths;
+import murray.csc325sprint1.Model.User;
+import murray.csc325sprint1.Model.UserFirestoreFunctions;
 
 import java.io.IOException;
+
+import static murray.csc325sprint1.Model.ViewPaths.LOGIN_SCREEN;
+import static murray.csc325sprint1.Model.ViewPaths.TERMS_SCREEN;
 
 public class CreateUserController {
 
     private static InitScreenController instance = InitScreenController.getInstance();
+    private static UserFirestoreFunctions instanceOfUserFirestore = UserFirestoreFunctions.getInstance();
+
     @FXML
     private CheckBox agreeCB;
 
@@ -39,16 +45,13 @@ public class CreateUserController {
     private TextField passwordTF;
 
     @FXML
+    private Button registerBtn;
+
+    @FXML
     private TextField securityAnswerTF;
 
     @FXML
     private ComboBox<String> securityQuestionCB;
-
-    @FXML
-    private TextField userNameTF;
-
-    @FXML
-    private Button registerBtn;
 
     private CreateUserController createUserController;
 
@@ -82,10 +85,30 @@ public class CreateUserController {
     @FXML
     void registerBtnClicked(ActionEvent event) {
         try {
-            GridPane signInGridPane = FXMLLoader.load(getClass().getResource(ViewPaths.CREATE_USER_SCREEN));
+                String password = passwordTF.getText().trim();
+                String confirmPassword = cPasswordTF.getText().trim();
+
+                if (!password.equals(confirmPassword)) {
+                    System.out.println("Passwords do not match.");
+                    return;
+                }
+
+                if (!agreeCB.isSelected()) {
+                    System.out.println("You must agree to the terms.");
+                    return;
+                }
+            User u = new User(
+                    fNameTF.getText().trim(),
+                    lNameTF.getText().trim(),
+                    emailTF.getText().trim(),
+                    securityQuestionCB.getValue(),
+                    securityAnswerTF.getText().trim(),
+                    passwordTF.getText().trim()
+            );
+            instanceOfUserFirestore.insertUser(u);
+            GridPane signInGridPane = FXMLLoader.load(getClass().getResource(LOGIN_SCREEN));
             instance.clearContent();
             instance.initScreenBorderPane.setCenter(signInGridPane);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -94,7 +117,7 @@ public class CreateUserController {
     @FXML
     void termsAndConditionHyperlinkClicked(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(ViewPaths.TERMS_SCREEN));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(TERMS_SCREEN));
             BorderPane termsPane = loader.load();
             TermsAndConditionsController controller = loader.getController();
             controller.setCreateUserController(this);
@@ -104,8 +127,7 @@ public class CreateUserController {
                     controller.agreeBtn.setDisable(false);
                 }
             });
-            instance.clearContent();
-            instance.initScreenBorderPane.setCenter(termsPane);
+            instance.initScreenBorderPane.setBottom(termsPane);
             instance.initScreenBorderPane.setPrefWidth(instance.initScreenBorderPane.getWidth() + termsPane.getWidth());
             instance.initScreenBorderPane.setPrefHeight(Math.max(instance.initScreenBorderPane.getHeight(), termsPane.getHeight()));
         } catch (IOException e) {

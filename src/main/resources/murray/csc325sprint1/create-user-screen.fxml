@@ -96,7 +96,7 @@
         </HBox>
         <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="2">
             <children>
-                <TextField fx:id="EmailTF" prefHeight="30.0" prefWidth="240.0">
+                <TextField fx:id="emailTF" prefHeight="30.0" prefWidth="240.0">
                     <font>
                         <Font size="14.0" />
                     </font>
