@@ -1,4 +1,4 @@
-package murray.csc325sprint1;
+package murray.csc325sprint1.Model;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;

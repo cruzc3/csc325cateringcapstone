@@ -4,7 +4,6 @@ import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import javafx.scene.control.Alert;
-import murray.csc325sprint1.FirestoreContext;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.HashMap;

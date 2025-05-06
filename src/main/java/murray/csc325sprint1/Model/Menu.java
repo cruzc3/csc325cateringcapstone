@@ -1,4 +1,4 @@
-package murray.csc325sprint1;
+package murray.csc325sprint1.Model;
 
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;

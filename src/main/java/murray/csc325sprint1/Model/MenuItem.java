@@ -1,4 +1,4 @@
-package murray.csc325sprint1;
+package murray.csc325sprint1.Model;
 
 public class MenuItem {
     private String name;

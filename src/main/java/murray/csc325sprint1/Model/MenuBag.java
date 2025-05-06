@@ -1,7 +1,5 @@
 package murray.csc325sprint1.Model;
 
-import murray.csc325sprint1.MenuItem;
-
 import java.util.HashMap;
 import java.util.Map;
 

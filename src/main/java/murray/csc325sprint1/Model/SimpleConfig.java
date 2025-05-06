@@ -1,4 +1,4 @@
-package murray.csc325sprint1;
+package murray.csc325sprint1.Model;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
