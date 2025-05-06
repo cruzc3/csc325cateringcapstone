@@ -8,7 +8,7 @@ import javafx.scene.control.TableView;
 public class empContactController {
 
     @FXML
-    private TableColumn<?, ?> dateColumn;
+    private TableColumn<?, ?> TicketIDColumn;
 
     @FXML
     private Button empGoBackBtn;
