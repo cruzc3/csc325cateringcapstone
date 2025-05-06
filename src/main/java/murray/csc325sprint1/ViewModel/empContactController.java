@@ -1,16 +1,29 @@
 package murray.csc325sprint1.ViewModel;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 
-public class empContactController extends Application {
+public class empContactController {
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+    @FXML
+    private TableColumn<?, ?> dateColumn;
 
-    @Override
-    public void start(Stage primaryStage) {
+    @FXML
+    private Button empGoBackBtn;
 
-    }
+    @FXML
+    private TableView<?> requestsTable;
+
+    @FXML
+    private TableColumn<?, ?> statusColumn;
+
+    @FXML
+    private TableColumn<?, ?> subjectColumn;
+
+    @FXML
+    private TableColumn<?, ?> userColumn;
+
 }
+
