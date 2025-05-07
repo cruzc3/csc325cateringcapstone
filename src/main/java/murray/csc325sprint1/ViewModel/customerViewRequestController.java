@@ -3,9 +3,11 @@ package murray.csc325sprint1.ViewModel;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 
-public class empReplyController {
+public class customerViewRequestController {
+
+    @FXML
+    private TextArea SubjectTA;
 
     @FXML
     private TextArea TicketIDTA;
@@ -17,16 +19,10 @@ public class empReplyController {
     private TextArea customerConcernTA;
 
     @FXML
-    private TextField empResponseTF;
-
-    @FXML
-    private Button sendButton;
+    private TextArea empResponseTA;
 
     @FXML
     private TextArea statusTA;
-
-    @FXML
-    private TextArea subjectTA;
 
     @FXML
     private TextArea usernameTA;
