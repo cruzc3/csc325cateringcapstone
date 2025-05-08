@@ -10,6 +10,11 @@ public class ViewPaths {
     public static final String LOAD_TEXT_TERMS_AND_CONDITIONS = "/Text/Terms2025.txt";
     public static final String ORDER_DETAILS_DIALOG_SCREEN = "/murray/csc325sprint1/OrderDetailsDialog.fxml";
     public static final String ORDER_VIEW_SCREEN = "/murray/csc325sprint1/OrderView.fxml";
+
     public static final String CATERING_MENU_VIEW_SCREEN = "/murray/csc325sprint1/catering-menu-view.fxml";
+
+    public static final String ORDER_LIST_VIEW_SCREEN = "/murray/csc325sprint1/OrderListView.fxml";
+    public static final String ORDER_EDIT_DIALOG_SCREEN = "/murray/csc325sprint1/OrderEditDialog.fxml";
+
 
 }
