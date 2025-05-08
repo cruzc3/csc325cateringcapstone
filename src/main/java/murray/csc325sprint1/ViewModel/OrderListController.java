@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
+import javafx.scene.Parent;
 
 public class OrderListController implements Initializable {
 
@@ -225,12 +226,34 @@ public class OrderListController implements Initializable {
      */
     private void openEditOrderDialog(OrderListItem orderItem) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/murray/csc325sprint1/OrderEditDialog.fxml"));
-            Pane dialogPane = loader.load();
+            // Create a new FXMLLoader instance with more specific parameters
+            FXMLLoader loader = new FXMLLoader();
 
+            // Set the location manually
+            URL fxmlLocation = getClass().getResource("/murray/csc325sprint1/OrderEditDialog.fxml");
+            loader.setLocation(fxmlLocation);
+
+            // Set the controller factory to create the controller yourself
+            loader.setControllerFactory(param -> {
+                try {
+                    OrderEditController controller = new OrderEditController();
+                    return controller;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            });
+
+            // Load the FXML
+            Parent dialogPane = loader.load();
+
+            // Get the controller
             OrderEditController controller = loader.getController();
+
+            // Initialize data after the FXML is loaded successfully
             controller.initData(orderItem, this);
 
+            // Create a new stage for the dialog
             Stage dialogStage = new Stage();
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.initStyle(StageStyle.UNDECORATED);
