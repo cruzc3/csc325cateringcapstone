@@ -24,13 +24,16 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+
 public class OrderController implements Initializable {
 
     @FXML private VBox menuContainer;
     @FXML private Button cartBtn;
+    @FXML private Button homeBtn;
 
     private Order currentOrder;
     private Menu menuService;
+    private String userEmail;
 
     /**
      * Initialize the controller
@@ -45,6 +48,15 @@ public class OrderController implements Initializable {
 
         // Load menu items
         loadMenuItems();
+
+        // Set user email on the current order
+        currentOrder.setUserEmail(userEmail);
+
+        // Set up home button event handler (if it exists)
+        if (homeBtn != null) {
+            homeBtn.setOnAction(event -> handleHomeButtonClick());
+        }
+
     }
 
     /**
@@ -232,4 +244,43 @@ public class OrderController implements Initializable {
             alert.showAndWait();
         }
     }
+
+    /**
+     * Set the user email (to be called from the login screen)
+     *
+     * @param email The user's email
+     */
+    public void setUserEmail(String email) {
+        this.userEmail = email;
+
+        // When we create the current order, also set the user email
+        if (currentOrder != null) {
+            currentOrder.setUserEmail(userEmail);
+        }
+    }
+
+    /**
+     * Add a button and handler to navigate back to the customer menu
+     */
+    @FXML
+    private void handleHomeButtonClick() {
+        try {
+            // Navigate back to customer menu
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/murray/csc325sprint1/customer-main.fxml"));
+            Parent root = loader.load();
+
+            Scene scene = new Scene(root);
+            Stage stage = (Stage) cartBtn.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Failed to navigate to home: " + e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
 }

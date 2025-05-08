@@ -194,6 +194,12 @@ public class OrderDetailsController implements Initializable {
         currentOrder.setPickupDate(datePicker.getValue().toString());
         currentOrder.setPickupTime(timeComboBox.getValue());
 
+        // Ensure user email is set (it comes from OrderController)
+        if (currentOrder.getUserEmail() == null || currentOrder.getUserEmail().isEmpty()) {
+            // Use default email if none provided (normally would come from logged-in user)
+            currentOrder.setUserEmail("customer@example.com");
+        }
+
         // Check if the time slot is available
         try {
             if (!orderService.isTimeSlotAvailable(currentOrder.getPickupDate(), currentOrder.getPickupTime())) {
@@ -202,7 +208,7 @@ public class OrderDetailsController implements Initializable {
                 return;
             }
 
-            // Save the order
+            // Save the order with user email
             boolean success = orderService.saveOrder(currentOrder);
 
             if (success) {
