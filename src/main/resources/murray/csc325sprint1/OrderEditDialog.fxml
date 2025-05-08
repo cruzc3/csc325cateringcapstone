@@ -1,13 +1,146 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<VBox prefHeight="300.0" prefWidth="400.0" spacing="10.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="murray.csc325sprint1.ViewModel.OrderEditController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="600.0" style="-fx-background-color: white; -fx-border-color: #CCCCCC;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="murray.csc325sprint1.ViewModel.OrderEditController">
     <children>
-        <Label text="Edit Order" />
-        <Label fx:id="orderIdLabel" text="[Order ID]" />
-        <Button fx:id="closeButton" mnemonicParsing="false" onAction="#closeDialog" text="Close" />
+        <HBox alignment="CENTER_RIGHT" prefHeight="50.0" prefWidth="200.0">
+            <children>
+                <Label text="Edit Order" textAlignment="CENTER">
+                    <font>
+                        <Font name="System Bold" size="24.0" />
+                    </font>
+                    <HBox.margin>
+                        <Insets right="180.0" />
+                    </HBox.margin>
+                </Label>
+                <Button fx:id="closeButton" mnemonicParsing="false" onAction="#closeDialog" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="×">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </Button>
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+        </HBox>
+        <Separator prefWidth="200.0" />
+        <VBox prefHeight="120.0" prefWidth="100.0" spacing="10.0">
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <children>
+                        <Label text="Order ID:">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="orderIdLabel" text="[Order ID]">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <children>
+                        <Label text="Total:">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="totalLabel" text="$0.00">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </HBox>
+                <Label text="Order Items:">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Label>
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+        </VBox>
+        <TableView fx:id="orderItemsTable" prefHeight="150.0" prefWidth="200.0">
+            <columns>
+                <TableColumn fx:id="itemNameColumn" prefWidth="280.0" text="Item" />
+                <TableColumn fx:id="quantityColumn" prefWidth="100.0" text="Quantity" />
+                <TableColumn fx:id="itemPriceColumn" prefWidth="100.0" text="Price" />
+                <TableColumn fx:id="itemActionColumn" prefWidth="100.0" text="Action" />
+            </columns>
+            <VBox.margin>
+                <Insets bottom="10.0" left="10.0" right="10.0" />
+            </VBox.margin>
+        </TableView>
+        <Separator prefWidth="200.0" />
+        <VBox prefHeight="110.0" prefWidth="100.0" spacing="15.0">
+            <children>
+                <Label text="Change pickup date and time:">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Label>
+                <HBox alignment="CENTER_LEFT" prefHeight="60.0" prefWidth="200.0" spacing="20.0">
+                    <children>
+                        <VBox>
+                            <children>
+                                <Label text="Date:">
+                                    <font>
+                                        <Font size="14.0" />
+                                    </font>
+                                </Label>
+                                <DatePicker fx:id="datePicker" prefHeight="30.0" prefWidth="200.0" />
+                            </children>
+                        </VBox>
+                        <VBox>
+                            <children>
+                                <Label text="Time:">
+                                    <font>
+                                        <Font size="14.0" />
+                                    </font>
+                                </Label>
+                                <ComboBox fx:id="timeComboBox" prefHeight="30.0" prefWidth="200.0" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+                <Label fx:id="availabilityLabel" text="Available slots: 5 of 5">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </Label>
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+        </VBox>
+        <HBox alignment="CENTER" prefHeight="60.0" prefWidth="200.0" spacing="20.0">
+            <children>
+                <Button fx:id="cancelOrderButton" mnemonicParsing="false" onAction="#cancelOrder" prefHeight="40.0" prefWidth="150.0" style="-fx-background-color: #ff6347;" text="Cancel Order" textFill="WHITE">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </Button>
+                <Button fx:id="saveChangesButton" mnemonicParsing="false" onAction="#saveChanges" prefHeight="40.0" prefWidth="150.0" style="-fx-background-color: #4caf50;" text="Save Changes" textFill="WHITE">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </Button>
+            </children>
+        </HBox>
     </children>
 </VBox>
