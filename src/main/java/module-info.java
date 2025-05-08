@@ -9,6 +9,7 @@ module murray.csc325sprint1 {
     requires com.google.api.apicommon;
     requires java.desktop;
     requires jbcrypt;
+    requires java.sql;
 
     // Open package to FXML
     opens murray.csc325sprint1 to javafx.fxml;
