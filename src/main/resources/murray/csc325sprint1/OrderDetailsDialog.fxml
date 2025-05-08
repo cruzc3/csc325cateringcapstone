@@ -5,12 +5,13 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="500.0" style="-fx-background-color: white; -fx-border-color: #CCCCCC;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="murray.csc325sprint1.OrderDetailsController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="550.0" style="-fx-background-color: white; -fx-border-color: #CCCCCC;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="murray.csc325sprint1.OrderDetailsController">
     <children>
         <HBox alignment="CENTER_RIGHT" prefHeight="50.0" prefWidth="200.0">
             <children>
@@ -19,7 +20,7 @@
                         <Font name="System Bold" size="24.0" />
                     </font>
                     <HBox.margin>
-                        <Insets right="120.0" />
+                        <Insets right="160.0" />
                     </HBox.margin>
                 </Label>
                 <Button fx:id="closeButton" ellipsisString="x" mnemonicParsing="false" onAction="#closeDialog" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" text="×" textOverrun="CLIP">
@@ -40,14 +41,27 @@
                         <Font name="System Bold" size="18.0" />
                     </font>
                 </Label>
-                <Label text="Items ordered:">
-                    <font>
-                        <Font size="14.0" />
-                    </font>
-                </Label>
-                <VBox fx:id="orderedItemsContainer" prefHeight="120.0" prefWidth="100.0" spacing="5.0">
-                    <!-- Ordered items will be added dynamically -->
-                </VBox>
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <children>
+                        <Label text="Items ordered:" prefWidth="100.0">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                        <Label text="Use controls to adjust quantities:" prefWidth="300.0">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </HBox>
+                <ScrollPane fitToWidth="true" prefHeight="150.0" prefWidth="100.0" styleClass="items-scroll-pane">
+                    <content>
+                        <VBox fx:id="orderedItemsContainer" prefHeight="120.0" prefWidth="100.0" spacing="8.0">
+                            <!-- Ordered items will be added dynamically -->
+                        </VBox>
+                    </content>
+                </ScrollPane>
             </children>
             <padding>
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -85,7 +99,7 @@
                         </VBox>
                     </children>
                 </HBox>
-                <!-- New availability label -->
+                <!-- Availability label -->
                 <Label fx:id="availabilityLabel" style="-fx-text-fill: green;" text="Available slots: 5 of 5">
                     <font>
                         <Font size="14.0" />
@@ -103,7 +117,7 @@
         </VBox>
         <HBox alignment="CENTER" prefHeight="60.0" prefWidth="200.0">
             <children>
-                <Button fx:id="placeOrderButton" mnemonicParsing="false" onAction="#placeOrder" prefHeight="40.0" prefWidth="120.0" style="-fx-background-color: #CCCCCC;" text="Place Order">
+                <Button fx:id="placeOrderButton" mnemonicParsing="false" onAction="#placeOrder" prefHeight="40.0" prefWidth="120.0" styleClass="place-order-button" text="Place Order">
                     <font>
                         <Font size="14.0" />
                     </font>

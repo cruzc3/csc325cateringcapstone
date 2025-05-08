@@ -35,6 +35,8 @@ public class Order {
      * @param quantity The quantity to add
      */
     public void addItem(MenuItem item, int quantity) {
+        if (quantity <= 0) return; // Don't add negative or zero quantities
+
         String itemName = item.getName();
 
         // If the item is already in the order, increase the quantity
@@ -50,12 +52,46 @@ public class Order {
     }
 
     /**
+     * Update an item's quantity directly
+     *
+     * @param item The menu item to update
+     * @param newQuantity The new quantity to set
+     * @return true if updated, false if not found
+     */
+    public boolean updateItemQuantity(MenuItem item, int newQuantity) {
+        String itemName = item.getName();
+
+        if (!orderItems.containsKey(itemName)) {
+            return false;
+        }
+
+        int currentQuantity = orderItems.get(itemName);
+
+        if (newQuantity <= 0) {
+            // Remove the item completely
+            orderItems.remove(itemName);
+            orderTotal -= item.getPrice() * currentQuantity;
+        } else {
+            // Calculate the difference and update total
+            int difference = newQuantity - currentQuantity;
+            orderTotal += item.getPrice() * difference;
+
+            // Update the quantity
+            orderItems.put(itemName, newQuantity);
+        }
+
+        return true;
+    }
+
+    /**
      * Remove an item from the order
      *
      * @param item The menu item to remove
      * @param quantity The quantity to remove
      */
     public void removeItem(MenuItem item, int quantity) {
+        if (quantity <= 0) return; // Don't remove negative or zero quantities
+
         String itemName = item.getName();
 
         if (orderItems.containsKey(itemName)) {

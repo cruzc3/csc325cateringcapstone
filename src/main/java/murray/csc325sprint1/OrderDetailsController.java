@@ -4,6 +4,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
@@ -11,6 +12,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -18,6 +21,11 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -31,19 +39,25 @@ public class OrderDetailsController implements Initializable {
     @FXML private ComboBox<String> timeComboBox;
     @FXML private Button placeOrderButton;
     @FXML private Button closeButton;
-    @FXML private Label availabilityLabel; // New label to show availability info
+    @FXML private Label availabilityLabel; // Label to show availability info
 
     private Order currentOrder;
     private boolean orderPlaced = false;
     private OrderService orderService;
+    private Menu menuService;
+    private Map<String, Spinner<Integer>> itemQuantitySpinners = new HashMap<>();
 
     /**
      * Initialize the controller
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Get the order service from MainApp
+        // Get the order service and menu service from MainApp
         orderService = MainApp.getOrderService();
+        menuService = MainApp.getMenu();
+
+        // Apply CSS styling
+        applyStyles();
 
         // Set up date picker with min date as tomorrow
         datePicker.setValue(LocalDate.now().plusDays(1));
@@ -71,6 +85,30 @@ public class OrderDetailsController implements Initializable {
         // Add listeners to update availability info when date or time changes
         datePicker.valueProperty().addListener((obs, oldVal, newVal) -> updateAvailabilityInfo());
         timeComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateAvailabilityInfo());
+
+        // Set styles for other elements
+        totalLabel.getStyleClass().add("total-label");
+        placeOrderButton.getStyleClass().add("place-order-button");
+    }
+
+    /**
+     * Apply CSS styles to the UI
+     */
+    private void applyStyles() {
+        try {
+            // Try to load the stylesheet
+            String stylesheet = "/murray/csc325sprint1/order-details-styles.css";
+            URL styleUrl = getClass().getResource(stylesheet);
+
+            if (styleUrl != null && totalLabel.getScene() != null) {
+                // Add the stylesheet to the scene
+                totalLabel.getScene().getStylesheets().add(styleUrl.toExternalForm());
+            } else {
+                System.err.println("Could not find order-details-styles.css stylesheet or scene not ready.");
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading stylesheet: " + e.getMessage());
+        }
     }
 
     /**
@@ -122,7 +160,7 @@ public class OrderDetailsController implements Initializable {
 
             // Enable or disable the place order button based on availability
             if (placeOrderButton != null) {
-                placeOrderButton.setDisable(remainingSlots <= 0);
+                placeOrderButton.setDisable(remainingSlots <= 0 || currentOrder.getOrderItems().isEmpty());
             }
 
         } catch (Exception e) {
@@ -138,6 +176,11 @@ public class OrderDetailsController implements Initializable {
      */
     public void setOrder(Order order) {
         this.currentOrder = order;
+
+        // Make sure styles are applied after scene is fully initialized
+        if (totalLabel.getScene() != null) {
+            applyStyles();
+        }
 
         // Update the UI with order details
         updateOrderDetails();
@@ -155,23 +198,148 @@ public class OrderDetailsController implements Initializable {
         }
 
         // Set the total
-        totalLabel.setText("Total: " + currentOrder.getFormattedTotal());
+        updateOrderTotal();
 
-        // Clear existing items
+        // Clear existing items and spinners
         orderedItemsContainer.getChildren().clear();
+        itemQuantitySpinners.clear();
 
-        // Add each ordered item
+        // Add each ordered item with quantity controls
         for (Map.Entry<String, Integer> entry : currentOrder.getOrderItems().entrySet()) {
             String itemName = entry.getKey();
             int quantity = entry.getValue();
 
+            // Get the actual menu item to access price information
+            MenuItem menuItem = findMenuItemByName(itemName);
+            if (menuItem == null) {
+                continue; // Skip if item not found
+            }
+
+            // Create an HBox for each item row
+            HBox itemRow = new HBox();
+            itemRow.getStyleClass().add("item-row");
+            itemRow.setSpacing(10);
+            itemRow.setPadding(new Insets(5));
+            itemRow.setAlignment(Pos.CENTER_LEFT);
+
             // Create a label for this item
-            Label itemLabel = new Label(itemName + " (x" + quantity + ")");
-            itemLabel.setStyle("-fx-font-size: 14;");
+            Label itemLabel = new Label(itemName);
+            itemLabel.getStyleClass().add("item-name");
+            HBox.setHgrow(itemLabel, Priority.ALWAYS);
+
+            // Add price info
+            double itemPrice = menuItem.getPrice();
+            Label priceLabel = new Label(String.format("$%.2f", itemPrice));
+            priceLabel.getStyleClass().add("item-price");
+
+            // Create quantity spinner
+            Spinner<Integer> quantitySpinner = new Spinner<>();
+            SpinnerValueFactory<Integer> valueFactory =
+                    new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, quantity);
+            quantitySpinner.setValueFactory(valueFactory);
+            quantitySpinner.getStyleClass().add("quantity-spinner");
+            quantitySpinner.setEditable(true);
+
+            // Store spinner for later access
+            itemQuantitySpinners.put(itemName, quantitySpinner);
+
+            // Add listener to update order when quantity changes
+            quantitySpinner.valueProperty().addListener((obs, oldValue, newValue) -> {
+                updateItemQuantity(menuItem, oldValue, newValue);
+            });
+
+            // Create remove button
+            Button removeButton = new Button("✕");
+            removeButton.getStyleClass().add("remove-button");
+
+            // Add action to remove button
+            removeButton.setOnAction(event -> removeItem(menuItem));
+
+            // Add a spacer
+            Region spacer = new Region();
+            HBox.setHgrow(spacer, Priority.ALWAYS);
+
+            // Add the elements to the item row
+            itemRow.getChildren().addAll(itemLabel, priceLabel, spacer, quantitySpinner, removeButton);
 
             // Add to container
-            orderedItemsContainer.getChildren().add(itemLabel);
+            orderedItemsContainer.getChildren().add(itemRow);
         }
+
+        // Add empty space message if no items
+        if (orderedItemsContainer.getChildren().isEmpty()) {
+            Label emptyLabel = new Label("Your cart is empty");
+            emptyLabel.getStyleClass().add("empty-cart");
+            orderedItemsContainer.getChildren().add(emptyLabel);
+
+            // Disable place order button when cart is empty
+            placeOrderButton.setDisable(true);
+        }
+    }
+
+    /**
+     * Update order when item quantity is changed
+     */
+    private void updateItemQuantity(MenuItem item, int oldValue, int newValue) {
+        if (item == null || oldValue == newValue) return;
+
+        if (newValue > oldValue) {
+            // Add more of this item
+            currentOrder.addItem(item, newValue - oldValue);
+        } else {
+            // Remove some of this item
+            currentOrder.removeItem(item, oldValue - newValue);
+        }
+
+        // Update the order total display
+        updateOrderTotal();
+
+        // Check if cart became empty and update UI accordingly
+        if (currentOrder.getOrderItems().isEmpty()) {
+            updateOrderDetails();
+        }
+
+        // Update availability info with new order state
+        updateAvailabilityInfo();
+    }
+
+    /**
+     * Remove an item from the order
+     */
+    private void removeItem(MenuItem item) {
+        if (item == null) return;
+
+        // Get current quantity
+        int quantity = currentOrder.getOrderItems().getOrDefault(item.getName(), 0);
+
+        // Remove all of this item
+        currentOrder.removeItem(item, quantity);
+
+        // Update the UI
+        updateOrderDetails();
+
+        // Update availability info with new order state
+        updateAvailabilityInfo();
+    }
+
+    /**
+     * Find a menu item by name
+     */
+    private MenuItem findMenuItemByName(String name) {
+        for (MenuItem item : menuService.getAllMenuItems()) {
+            if (item.getName().equals(name)) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Update the order total display
+     */
+    private void updateOrderTotal() {
+        totalLabel.setText("Total: " + currentOrder.getFormattedTotal());
+        totalLabel.getStyleClass().add("total-label");
     }
 
     /**
@@ -187,6 +355,12 @@ public class OrderDetailsController implements Initializable {
 
         if (timeComboBox.getValue() == null) {
             showError("Please select a time for pickup.");
+            return;
+        }
+
+        // Check if cart is empty
+        if (currentOrder.getOrderItems().isEmpty()) {
+            showError("Your cart is empty. Please add items before placing an order.");
             return;
         }
 
