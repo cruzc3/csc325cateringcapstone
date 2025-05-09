@@ -14,7 +14,7 @@ public class UserFirestoreFunctions {
     private static volatile UserFirestoreFunctions instanceOfUserFirestore;
     private final Firestore db;
     private static final String USER_COLLECTION = "Users";
-
+    private static User currentUser;
     // Private constructor to prevent instantiation
     private UserFirestoreFunctions() {
         db = FirestoreContext.getInstance().getFirestore();
@@ -30,6 +30,14 @@ public class UserFirestoreFunctions {
             }
         }
         return instanceOfUserFirestore;
+    }
+
+    public static synchronized User getCurrentUser() {
+        return currentUser;
+    }
+
+    private static synchronized void setCurrentUser(User u) {
+        currentUser = u;
     }
 
     public void insertUser(User u) {
@@ -70,15 +78,10 @@ public class UserFirestoreFunctions {
         }
     }
 
-    public void updateUser(User u) {
+    public void updateUserPassword(User u) {
         try {
             String documentId = u.getEmail().toLowerCase();
             Map<String, Object> updates = new HashMap<>();
-            updates.put("first name", u.getfName());
-            updates.put("last name", u.getlName());
-            updates.put("security question", u.getSecQuestion());
-            updates.put("security answer", u.getSecAnswer());
-            updates.put("is employee", u.isEmployee());
 
             if (u.getPassword() != null && !u.getPassword().isEmpty()) {
                 updates.put("password", hashPassword(u.getPassword()));
@@ -91,17 +94,50 @@ public class UserFirestoreFunctions {
         }
     }
 
+    public void promoteToEmployee(User u) {
+        try {
+            String documentId = u.getEmail().toLowerCase();
+            Map<String, Object> updates = new HashMap<>();
+            u.setEmployee(true);
+            updates.put("is employee", u.isEmployee());
+            db.collection(USER_COLLECTION).document(documentId).update(updates).get();
+        } catch (Exception e) {
+            System.err.println("Error updating user employee status: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void demoteToEmployee(User u) {
+        try {
+            String documentId = u.getEmail().toLowerCase();
+            Map<String, Object> updates = new HashMap<>();
+            u.setEmployee(false);
+            updates.put("is employee", u.isEmployee());
+            db.collection(USER_COLLECTION).document(documentId).update(updates).get();
+        } catch (Exception e) {
+            System.err.println("Error updating user employee status: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     public User findUser(String email) {
         try {
             DocumentSnapshot snapshot = db.collection(USER_COLLECTION).document(email).get().get();
             if (snapshot.exists()) {
+                String firstName = snapshot.getString("first name");
+                String lastName = snapshot.getString("last name");
+                String userEmail = snapshot.getString("email");
+                String secQuestion = snapshot.getString("security question");
+                String secAnswer = snapshot.getString("security answer");
+                Boolean isEmployee = snapshot.getBoolean("is employee");
+
                 return new User(
-                        snapshot.getString("first name"),
-                        snapshot.getString("last name"),
-                        snapshot.getString("email"),
-                        snapshot.getString("security question"),
-                        snapshot.getString("security answer"),
-                        snapshot.getString("password")
+                        firstName,
+                        lastName,
+                        userEmail,
+                        secQuestion,
+                        secAnswer,
+                        Boolean.TRUE.equals(isEmployee)
                 );
             }
         } catch (Exception e) {
@@ -132,7 +168,10 @@ public class UserFirestoreFunctions {
 
             if (snapshot.exists()) {
                 String storedHashedPassword = snapshot.getString("password");
-                return verifyPassword(plainPassword, storedHashedPassword);
+                if (verifyPassword(plainPassword, storedHashedPassword)) {
+                    setCurrentUser(findUser(email));
+                    return true;
+                }
             }
         } catch (Exception e) {
             System.err.println("Login verification error: " + e.getMessage());

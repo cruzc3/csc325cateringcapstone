@@ -103,7 +103,7 @@ public class ResetScreenController {
         boolean success = false;
         if (u != null && u.getSecAnswer().equalsIgnoreCase(answerTF.getText().trim())) {
             u.setPassword(nPasswordTF.getText().trim());
-            uFF.updateUser(u);
+            uFF.updateUserPassword(u);
             success = true;
             Alert a = new Alert(Alert.AlertType.INFORMATION);
             if (success) {

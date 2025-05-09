@@ -17,6 +17,16 @@ public class User {
         this.employee = false;
     }
 
+    public User(String fName, String lName, String email, String secQuestion, String secAnswer, Boolean employeeStatus) {
+        this.fName = fName;
+        this.lName = lName;
+        this.email = email;
+        this.secQuestion = secQuestion;
+        this.secAnswer = secAnswer;
+        this.employee = employeeStatus;
+    }
+
+
     public String getfName() {
         return fName;
     }

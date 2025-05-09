@@ -16,5 +16,7 @@ public class ViewPaths {
     public static final String ORDER_LIST_VIEW_SCREEN = "/murray/csc325sprint1/OrderListView.fxml";
     public static final String ORDER_EDIT_DIALOG_SCREEN = "/murray/csc325sprint1/OrderEditDialog.fxml";
 
-
+    //-----------------------Boolean expression what directs users to corresponding panes----------\\
+    public static final String EMP_MAIN = "/murray/csc325sprint1/emp-main.fxml";
+    public static final String CUST_MAIN = "/murray/csc325sprint1/customer-main.fxml";
 }

@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -13,9 +14,14 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import murray.csc325sprint1.Model.User;
 import murray.csc325sprint1.Model.UserFirestoreFunctions;
 
 import java.io.IOException;
+import java.util.Objects;
+
+import static murray.csc325sprint1.Model.ViewPaths.CUST_MAIN;
+import static murray.csc325sprint1.Model.ViewPaths.EMP_MAIN;
 
 
 public class LoginScreenController {
@@ -45,6 +51,7 @@ public class LoginScreenController {
 
     @FXML
     public void initialize() {
+        instanceOfUserFirestore = UserFirestoreFunctions.getInstance();
         passwordTF.textProperty().bindBidirectional(passwordPF.textProperty());
         Platform.runLater(() -> {
             Stage stage = (Stage) signInGridPane.getScene().getWindow();
@@ -108,7 +115,7 @@ public class LoginScreenController {
 
     @FXML
     void loginBtnClicked(ActionEvent event) {
-        try{
+        try {
             String email = emailTF.getText().trim();
             String password = passwordPF.isVisible() ? passwordPF.getText().trim() : passwordTF.getText().trim();
             if (email.isEmpty() || password.isEmpty()) {
@@ -118,9 +125,24 @@ public class LoginScreenController {
             boolean isValid = instanceOfUserFirestore.verifyLogin(email, password);
             if (isValid) {
                 loginLbl.setText("Login successful!");
-//                [Change this to whatever container holds the next screen] AfterLoginPane = FXMLLoader.load(getClass().getResource());
-                instance.clearContent();
-//                instance.initScreenBorderPane.setCenter(AfterLoginPane);
+                try {
+                    Parent nextPane;
+                    User u = instanceOfUserFirestore.getCurrentUser();
+                    u.toString();
+                    System.out.println(u.isEmployee());
+                    if (instanceOfUserFirestore.getCurrentUser().isEmployee()) {
+                        nextPane = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(EMP_MAIN)));
+                        System.out.println(UserFirestoreFunctions.getCurrentUser().isEmployee());
+                        System.out.println("User: " + UserFirestoreFunctions.getCurrentUser());
+                        System.out.print("Welcome valued employee");
+                    } else {
+                        nextPane = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(CUST_MAIN)));
+                    }
+                    instance.clearContent();
+                    instance.initScreenBorderPane.setCenter(nextPane);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             } else {
                 loginLbl.setText("Invalid email or password.");
             }

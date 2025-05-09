@@ -24,12 +24,8 @@ public class TestInitApp extends Application {
         }
 
     public static void main(String[] args) {
-        User u = new User ("","","helloworld@farmingdale.edu","","","");
-        instanceOfUserFirestore.insertUser(u);
-        u.setEmail("helloworld123@farmingdale.edu");
-        instanceOfUserFirestore.updateUser(u);
-
-
+//        User u = instanceOfUserFirestore.findUser("joe@farmingdale.edu");
+//        instanceOfUserFirestore.promoteToEmployee(u);
         launch(args);
     }
 }
