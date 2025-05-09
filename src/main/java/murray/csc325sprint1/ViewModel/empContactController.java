@@ -72,26 +72,29 @@ public class empContactController {
             empReplyController controller = loader.getController();
             controller.initData(ticket);
 
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.show();
+            Stage replyStage = new Stage();
+            replyStage.setScene(new Scene(root));
+            replyStage.show();
+
+            // No need to pass parent stage anymore
         } catch (IOException e) {
             e.printStackTrace();
             showAlert("Error", "Failed to open reply window");
         }
     }
 
+
+
     private void loadTickets() {
         ObservableList<EmployeeSupport> tickets = FXCollections.observableArrayList(
-                firestore.getAllTickets() // Already sorted by timestamp (newest first)
+                firestore.getAllTickets()
         );
 
-        // Sort open tickets to the top (while keeping timestamp order)
         tickets.sort((t1, t2) -> {
             if (t1.isClosed() == t2.isClosed()) {
-                return 0; // Keep Firestore's order (newest first)
+                return 0;
             }
-            return t1.isClosed() ? 1 : -1; // Open tickets come first
+            return t1.isClosed() ? 1 : -1;
         });
 
         requestsTable.setItems(tickets);
@@ -116,3 +119,5 @@ public class empContactController {
         alert.showAndWait();
     }
 }
+
+

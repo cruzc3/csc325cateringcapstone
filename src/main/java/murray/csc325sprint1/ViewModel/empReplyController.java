@@ -1,5 +1,6 @@
 package murray.csc325sprint1.ViewModel;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -17,7 +18,12 @@ public class empReplyController {
     @FXML private Button backButton;
 
     private EmployeeSupport currentTicket;
+    private Stage parentStage;
     private final SupportFirestoreFunctions firestore = SupportFirestoreFunctions.getInstance();
+
+    public void setParentStage(Stage parentStage) {
+        this.parentStage = parentStage;
+    }
 
     public void initData(EmployeeSupport ticket) {
         this.currentTicket = ticket;
@@ -51,11 +57,16 @@ public class empReplyController {
     }
 
     @FXML
-    private void closeWindow(){
-        Stage stage = (Stage) empResponseTF.getScene().getWindow();
+    private void handleBackButton() {
+        // Simply close the current window
+        Stage stage = (Stage) backButton.getScene().getWindow();
         stage.close();
     }
 
+    private void closeWindow() {
+        Stage stage = (Stage) empResponseTF.getScene().getWindow();
+        stage.close();
+    }
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -65,3 +76,5 @@ public class empReplyController {
         alert.showAndWait();
     }
 }
+
+
