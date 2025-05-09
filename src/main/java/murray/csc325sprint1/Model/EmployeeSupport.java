@@ -8,15 +8,25 @@ public class EmployeeSupport {
     private boolean isClosed;
     private String response;
 
-    public EmployeeSupport() {}
+    private long timestamp; // Add this
 
-    public EmployeeSupport(int ticketID, String user, String subject, String cusmsg, boolean isClosed, String response) {
+    public EmployeeSupport(int ticketID, String user, String subject, String cusmsg, boolean isClosed, String response, long timestamp) {
         this.ticketID = ticketID;
         this.user = user;
         this.subject = subject;
         this.cusmsg = cusmsg;
         this.isClosed = isClosed;
         this.response = response;
+        this.timestamp = timestamp; // Add this
+    }
+
+    // Add getter & setter
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
     public int getTicketID() {

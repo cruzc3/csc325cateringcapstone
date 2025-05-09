@@ -42,7 +42,8 @@ public class customerContactController {
                 subject,
                 message,
                 false,
-                ""
+                "",
+                System.currentTimeMillis() // Add timestamp here
         );
 
         firestore.insertTicket(ticket);

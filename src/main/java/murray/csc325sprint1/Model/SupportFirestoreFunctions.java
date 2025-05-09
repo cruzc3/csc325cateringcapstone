@@ -39,13 +39,17 @@ public class SupportFirestoreFunctions {
             ticketInfo.put("cusmsg", ticket.getCusmsg());
             ticketInfo.put("isClosed", ticket.isClosed());
             ticketInfo.put("response", ticket.getResponse());
+            ticketInfo.put("timestamp", System.currentTimeMillis()); // Add this
 
-            db.collection(COLLECTION_NAME).document(String.valueOf(ticket.getTicketID())).set(ticketInfo).get();
+            db.collection(COLLECTION_NAME)
+                    .document(String.valueOf(ticket.getTicketID()))
+                    .set(ticketInfo)
+                    .get();
         } catch (Exception e) {
-            System.err.println("Error while inserting ticket: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error inserting ticket: " + e.getMessage());
         }
     }
+
 
     public void updateResponse(int ticketID, String response) {
         try {
@@ -72,7 +76,8 @@ public class SupportFirestoreFunctions {
                         doc.getString("subject"),
                         doc.getString("cusmsg"),
                         doc.getBoolean("isClosed"),
-                        doc.getString("response")
+                        doc.getString("response"),
+                        doc.getLong("timestamp") // Add this line
                 );
             }
         } catch (Exception e) {
@@ -85,28 +90,29 @@ public class SupportFirestoreFunctions {
     public List<EmployeeSupport> getAllTickets() {
         List<EmployeeSupport> tickets = new ArrayList<>();
         try {
-            // Query with ordering by timestamp (if available) or ticketID (as fallback)
             ApiFuture<QuerySnapshot> future = db.collection(COLLECTION_NAME)
-                    .orderBy("ticketID", Query.Direction.DESCENDING) // Assuming higher ticketID = newer
+                    .orderBy("timestamp", Query.Direction.DESCENDING) // Newest first
                     .get();
 
-            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-            for (QueryDocumentSnapshot document : documents) {
+            for (QueryDocumentSnapshot document : future.get().getDocuments()) {
                 tickets.add(new EmployeeSupport(
                         document.getLong("ticketID").intValue(),
                         document.getString("user"),
                         document.getString("subject"),
                         document.getString("cusmsg"),
                         document.getBoolean("isClosed"),
-                        document.getString("response")
+                        document.getString("response"),
+                        document.getLong("timestamp") // Add this
                 ));
             }
         } catch (Exception e) {
-            System.err.println("Error while getting all tickets: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error fetching tickets: " + e.getMessage());
         }
         return tickets;
     }
+
+
+
 
 
 

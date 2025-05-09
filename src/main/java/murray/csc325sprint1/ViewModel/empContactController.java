@@ -83,19 +83,21 @@ public class empContactController {
 
     private void loadTickets() {
         ObservableList<EmployeeSupport> tickets = FXCollections.observableArrayList(
-                firestore.getAllTickets()
+                firestore.getAllTickets() // Already sorted by timestamp (newest first)
         );
 
-        // Sort open tickets first, then closed (while maintaining Firestore's DESC order)
+        // Sort open tickets to the top (while keeping timestamp order)
         tickets.sort((t1, t2) -> {
             if (t1.isClosed() == t2.isClosed()) {
-                return 0; // Keep original order (newest first)
+                return 0; // Keep Firestore's order (newest first)
             }
             return t1.isClosed() ? 1 : -1; // Open tickets come first
         });
 
         requestsTable.setItems(tickets);
     }
+
+
 
 
 
