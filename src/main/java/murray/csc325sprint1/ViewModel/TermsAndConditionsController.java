@@ -1,5 +1,6 @@
 package murray.csc325sprint1.ViewModel;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,7 +25,7 @@ public class TermsAndConditionsController {
     private static InitScreenController instance = InitScreenController.getInstance();
 
     @FXML
-    private BorderPane TCBP;
+    private BorderPane tCBP;
 
     @FXML
     Button agreeBtn;
@@ -43,11 +44,17 @@ public class TermsAndConditionsController {
 
     private Runnable onAgreeCallback;
 
+    private Stage theStage;
+
     public void setOnAgreeCallback(Runnable callback) {
         this.onAgreeCallback = callback;
     }
 
     private CreateUserController createUserController;
+
+    double prefWidth;
+
+    double prefHeight;
 
     public void setCreateUserController(CreateUserController controller) {
         this.createUserController = controller;
@@ -56,6 +63,17 @@ public class TermsAndConditionsController {
     @FXML
     public void initialize() {
         loadTermsText();
+        Platform.runLater(() -> {
+            Stage stage = (Stage) tCBP.getScene().getWindow();
+            if (stage != null) {
+        prefWidth = tCBP.prefWidth(-1);
+        prefHeight = tCBP.prefHeight(-1);
+        stage.setWidth(instance.initScreenBorderPane.getPrefWidth() + prefWidth);
+        stage.setHeight(prefHeight + 30);
+        stage.centerOnScreen(); // Optional
+                stageIsSet(stage);
+            }
+        });
         conditionsSP.vvalueProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal.doubleValue() > .9) {
                 answerBtnContainer.setDisable(false);
@@ -63,6 +81,10 @@ public class TermsAndConditionsController {
                 disagreeBtn.setDisable(false);
             }
         });
+    }
+
+    private void stageIsSet(Stage stage){
+        this.theStage = stage;
     }
 
     private void loadTermsText() {
@@ -84,6 +106,10 @@ public class TermsAndConditionsController {
     void agreenTermsAndCondiitonBtnClicked(ActionEvent event) {
         if (createUserController != null) {
             createUserController.userAgreedToTerms();
+            instance.initScreenBorderPane.setRight(null);
+            theStage.setWidth(instance.initScreenBorderPane.getPrefWidth());
+            theStage.setHeight(instance.initScreenBorderPane.getPrefHeight()+20);
+            theStage.centerOnScreen();
         }
 
     }

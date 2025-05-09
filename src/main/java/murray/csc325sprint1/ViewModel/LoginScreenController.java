@@ -1,5 +1,6 @@
 package murray.csc325sprint1.ViewModel;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import murray.csc325sprint1.Model.UserFirestoreFunctions;
 
 import java.io.IOException;
@@ -44,6 +46,19 @@ public class LoginScreenController {
     @FXML
     public void initialize() {
         passwordTF.textProperty().bindBidirectional(passwordPF.textProperty());
+        Platform.runLater(() -> {
+            Stage stage = (Stage) signInGridPane.getScene().getWindow();
+
+            signInGridPane.applyCss();  // Ensure styles are applied
+            signInGridPane.layout();    // Force layout pass
+
+            double prefWidth = signInGridPane.prefWidth(-1);
+            double prefHeight = signInGridPane.prefHeight(-1);
+
+            stage.setWidth(prefWidth);
+            stage.setHeight(prefHeight + 20);
+            stage.centerOnScreen();     // Center the stage
+        });
     }
 
     @FXML

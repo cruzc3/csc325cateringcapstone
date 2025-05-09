@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="391.0" prefWidth="704.0" style="-fx-background-color: #BC9A6E;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="murray.csc325sprint1.ViewModel.CreateUserController">
+<GridPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="391.0" minWidth="704.0" prefHeight="425.0" prefWidth="704.0" style="-fx-background-color: #BC9A6E;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="murray.csc325sprint1.ViewModel.CreateUserController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="295.20001220703125" minWidth="10.0" prefWidth="182.59998779296876" />
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="295.20001220703125" minWidth="10.0" prefWidth="189.6000244140625" />
