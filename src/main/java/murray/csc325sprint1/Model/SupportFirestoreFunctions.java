@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class SupportFirestoreFunctions {
     private static volatile SupportFirestoreFunctions instance;
@@ -30,51 +31,50 @@ public class SupportFirestoreFunctions {
     }
 
     public void insertTicket(EmployeeSupport ticket) {
-        try{
+        try {
             Map<String, Object> ticketInfo = new HashMap<>();
+            ticketInfo.put("ticketID", ticket.getTicketID());
             ticketInfo.put("user", ticket.getUser());
             ticketInfo.put("subject", ticket.getSubject());
-            ticketInfo.put("cusmsg", ticket.getcusmsg());
-            ticketInfo.put("status", ticket.getStatus());
+            ticketInfo.put("cusmsg", ticket.getCusmsg());
+            ticketInfo.put("isClosed", ticket.isClosed());
             ticketInfo.put("response", ticket.getResponse());
 
             db.collection(COLLECTION_NAME).document(String.valueOf(ticket.getTicketID())).set(ticketInfo).get();
-
         } catch (Exception e) {
-            System.err.println("Error while inserting ticket" + e.getMessage());
+            System.err.println("Error while inserting ticket: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    public void updateResponse(int TicketID, String response, String status) {
-        try{
+    public void updateResponse(int ticketID, String response) {
+        try {
             Map<String, Object> update = new HashMap<>();
             update.put("response", response);
-            update.put("status", status);
-            db.collection(COLLECTION_NAME).document(String.valueOf(TicketID)).update(update).get();
+            update.put("isClosed", true);
+            db.collection(COLLECTION_NAME).document(String.valueOf(ticketID)).update(update).get();
         } catch (Exception e) {
-            System.err.println("Error while updating response" + e.getMessage());
+            System.err.println("Error while updating response: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    public EmployeeSupport getTicket(int TicketID) {
-        try{
-            DocumentReference docRef = db.collection(COLLECTION_NAME).document(String.valueOf(TicketID));
+    public EmployeeSupport getTicket(int ticketID) {
+        try {
+            DocumentReference docRef = db.collection(COLLECTION_NAME).document(String.valueOf(ticketID));
             DocumentSnapshot doc = docRef.get().get();
-            if(doc.exists()) {
+            if (doc.exists()) {
                 return new EmployeeSupport(
-                        TicketID,
+                        doc.getLong("ticketID").intValue(),
                         doc.getString("user"),
                         doc.getString("subject"),
                         doc.getString("cusmsg"),
-                        doc.getString("status"),
+                        doc.getBoolean("isClosed"),
                         doc.getString("response")
-
                 );
             }
         } catch (Exception e) {
-            System.err.println("Error while getting ticket" + e.getMessage());
+            System.err.println("Error while getting ticket: " + e.getMessage());
             e.printStackTrace();
         }
         return null;
@@ -82,18 +82,23 @@ public class SupportFirestoreFunctions {
 
     public List<EmployeeSupport> getAllTickets() {
         List<EmployeeSupport> tickets = new ArrayList<>();
-        try{
+        try {
             ApiFuture<QuerySnapshot> future = db.collection(COLLECTION_NAME).get();
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-            for(QueryDocumentSnapshot document : documents) {
-                EmployeeSupport ticket = document.toObject(EmployeeSupport.class);
-                tickets.add(ticket);
+            for (QueryDocumentSnapshot document : documents) {
+                tickets.add(new EmployeeSupport(
+                        document.getLong("ticketID").intValue(),
+                        document.getString("user"),
+                        document.getString("subject"),
+                        document.getString("cusmsg"),
+                        document.getBoolean("isClosed"),
+                        document.getString("response")
+                ));
             }
-        }catch(Exception e) {
+        } catch (Exception e) {
+            System.err.println("Error while getting all tickets: " + e.getMessage());
             e.printStackTrace();
         }
-
         return tickets;
     }
-
 }

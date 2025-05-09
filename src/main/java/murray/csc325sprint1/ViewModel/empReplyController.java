@@ -1,70 +1,69 @@
 package murray.csc325sprint1.ViewModel;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import murray.csc325sprint1.Model.EmployeeSupport;
 import murray.csc325sprint1.Model.SupportFirestoreFunctions;
 
 public class empReplyController {
+    @FXML private TextArea TicketIDTA;
+    @FXML private TextArea usernameTA;
+    @FXML private TextArea subjectTA;
+    @FXML private TextArea customerConcernTA;
+    @FXML private TextArea statusTA;
+    @FXML private TextField empResponseTF;
+    @FXML private Button sendButton;
+    @FXML private Button backButton;
 
-    @FXML
-    private TextArea TicketIDTA;
+    private EmployeeSupport currentTicket;
+    private final SupportFirestoreFunctions firestore = SupportFirestoreFunctions.getInstance();
 
-    @FXML
-    private Button backButton;
+    public void initData(EmployeeSupport ticket) {
+        this.currentTicket = ticket;
 
-    @FXML
-    private TextArea customerConcernTA;
+        TicketIDTA.setText(String.valueOf(ticket.getTicketID()));
+        usernameTA.setText(ticket.getUser());
+        subjectTA.setText(ticket.getSubject());
+        customerConcernTA.setText(ticket.getCusmsg());
+        statusTA.setText(ticket.isClosed() ? "Closed" : "Open");
 
-    @FXML
-    private TextField empResponseTF;
-
-    @FXML
-    private Button sendButton;
-
-    @FXML
-    private TextArea statusTA;
-
-    @FXML
-    private TextArea subjectTA;
-
-    @FXML
-    private TextArea usernameTA;
-
-
-    private final SupportFirestoreFunctions firestoreFunctions = SupportFirestoreFunctions.getInstance();
-
-    @FXML
-    private void initialize() {
-        sendButton.setOnAction(e -> SendButtonClicked());
-        backButton.setOnAction(e -> backButtonClicked());
-    }
-
-    private void SendButtonClicked() {
-        try{
-            int ticketID = Integer.parseInt(TicketIDTA.getText().trim());
-            String user = usernameTA.getText().trim();
-            String status = statusTA.getText().trim();
-            String subject = subjectTA.getText().trim();
-            String response = empResponseTF.getText().trim();
-            String cusmsg = customerConcernTA.getText().trim();
-
-            EmployeeSupport ticket = new EmployeeSupport(ticketID, user, subject, status, response, cusmsg);
-            firestoreFunctions.updateResponse(ticketID, response, status);
-            Stage stage = (Stage) sendButton.getScene().getWindow();
-            stage.close();
-        }catch(NumberFormatException e){
-            System.err.println("Invalid Ticket");
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        if (ticket.isClosed()) {
+            empResponseTF.setText(ticket.getResponse());
+            empResponseTF.setEditable(false);
+            sendButton.setVisible(false);
         }
     }
-    private void backButtonClicked() {
+
+    @FXML
+    private void handleSendButton() {
+        String response = empResponseTF.getText().trim();
+
+        if (response.isEmpty()) {
+            showAlert("Error", "Response cannot be empty!");
+            return;
+        }
+
+        firestore.updateResponse(currentTicket.getTicketID(), response);
+        showAlert("Success", "Response sent successfully!");
+        closeWindow();
+    }
+
+    @FXML
+    private void handleBackButton() {
+        closeWindow();
+    }
+
+    private void closeWindow() {
         Stage stage = (Stage) backButton.getScene().getWindow();
         stage.close();
     }
 
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 }
