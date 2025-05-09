@@ -1,14 +1,12 @@
 package murray.csc325sprint1.ViewModel;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -53,6 +51,9 @@ public class CreateUserController {
     @FXML
     private ComboBox<String> securityQuestionCB;
 
+    @FXML
+    private GridPane rootPane;
+
     private CreateUserController createUserController;
 
     @FXML
@@ -60,6 +61,20 @@ public class CreateUserController {
         securityQuestionCB.setItems(
                 FXCollections.observableArrayList(SecurityQuestion.getAllQuestions())
         );
+        Platform.runLater(() -> {
+            Stage stage = (Stage) rootPane.getScene().getWindow();
+
+            // Ensure the stage resizes to fit the preferred size of the content
+            rootPane.applyCss();  // Ensures styles are applied before layout pass
+            rootPane.layout();    // Forces layout pass to calculate preferred size
+
+            double prefWidth = rootPane.prefWidth(-1);
+            double prefHeight = rootPane.prefHeight(-1);
+
+            stage.setWidth(prefWidth);
+            stage.setHeight(prefHeight);
+            stage.centerOnScreen(); // Optional: keep UI centered
+        });
     }
 
     public void setCreateUserController(CreateUserController controller) {
@@ -75,8 +90,9 @@ public class CreateUserController {
     @FXML
     void backBtnClciked(ActionEvent event) {
         try {
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.close();
+            GridPane signInGridPane = FXMLLoader.load(getClass().getResource(LOGIN_SCREEN));
+            instance.clearContent();
+            instance.initScreenBorderPane.setCenter(signInGridPane);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -84,33 +100,45 @@ public class CreateUserController {
 
     @FXML
     void registerBtnClicked(ActionEvent event) {
-        try {
+        if (fNameTF.getText().trim().isEmpty() ||
+                lNameTF.getText().trim().isEmpty() ||
+                emailTF.getText().trim().isEmpty() ||
+                passwordTF.getText().trim().isEmpty() ||
+                cPasswordTF.getText().trim().isEmpty() ||
+                securityAnswerTF.getText().trim().isEmpty() ||
+                securityQuestionCB.getSelectionModel().isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Incomplete Form");
+            alert.setHeaderText(null);
+            alert.setContentText("Please fill in all required fields before continuing.");
+            alert.showAndWait();
+        } else {
+            try {
                 String password = passwordTF.getText().trim();
                 String confirmPassword = cPasswordTF.getText().trim();
-
                 if (!password.equals(confirmPassword)) {
                     System.out.println("Passwords do not match.");
                     return;
                 }
-
                 if (!agreeCB.isSelected()) {
                     System.out.println("You must agree to the terms.");
                     return;
                 }
-            User u = new User(
-                    fNameTF.getText().trim(),
-                    lNameTF.getText().trim(),
-                    emailTF.getText().trim(),
-                    securityQuestionCB.getValue(),
-                    securityAnswerTF.getText().trim(),
-                    passwordTF.getText().trim()
-            );
-            instanceOfUserFirestore.insertUser(u);
-            GridPane signInGridPane = FXMLLoader.load(getClass().getResource(LOGIN_SCREEN));
-            instance.clearContent();
-            instance.initScreenBorderPane.setCenter(signInGridPane);
-        } catch (IOException e) {
-            e.printStackTrace();
+                User u = new User(
+                        fNameTF.getText().trim(),
+                        lNameTF.getText().trim(),
+                        emailTF.getText().trim(),
+                        securityQuestionCB.getValue(),
+                        securityAnswerTF.getText().trim(),
+                        passwordTF.getText().trim()
+                );
+                instanceOfUserFirestore.insertUser(u);
+                GridPane signInGridPane = FXMLLoader.load(getClass().getResource(LOGIN_SCREEN));
+                instance.clearContent();
+                instance.initScreenBorderPane.setCenter(signInGridPane);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -127,7 +155,7 @@ public class CreateUserController {
                     controller.agreeBtn.setDisable(false);
                 }
             });
-            instance.initScreenBorderPane.setBottom(termsPane);
+            instance.initScreenBorderPane.setRight(termsPane);
             instance.initScreenBorderPane.setPrefWidth(instance.initScreenBorderPane.getWidth() + termsPane.getWidth());
             instance.initScreenBorderPane.setPrefHeight(Math.max(instance.initScreenBorderPane.getHeight(), termsPane.getHeight()));
         } catch (IOException e) {

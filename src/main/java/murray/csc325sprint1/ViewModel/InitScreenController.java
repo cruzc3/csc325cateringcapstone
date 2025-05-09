@@ -100,6 +100,7 @@ public class InitScreenController {
             GridPane signInGridPane = FXMLLoader.load(getClass().getResource(murray.csc325sprint1.Model.ViewPaths.LOGIN_SCREEN));
             clearContent();
             initScreenBorderPane.setCenter(signInGridPane);
+            initScreenBorderPane.resize(signInGridPane.getPrefWidth(),signInGridPane.getPrefHeight());
             resizeBorderPaneToFitContent(signInGridPane);
         } catch (IOException e) {
             e.printStackTrace();
@@ -112,7 +113,7 @@ public class InitScreenController {
             GridPane signUpGridPane = FXMLLoader.load(getClass().getResource(murray.csc325sprint1.Model.ViewPaths.CREATE_USER_SCREEN));
             clearContent();
             initScreenBorderPane.setLeft(signUpGridPane);
-            resizeBorderPaneToFitContent(signUpGridPane);
+            initScreenBorderPane.resize(signUpGridPane.getPrefWidth(),signUpGridPane.getPrefHeight());
         } catch (IOException e) {
             e.printStackTrace();
         }
