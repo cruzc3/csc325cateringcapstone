@@ -85,7 +85,11 @@ public class SupportFirestoreFunctions {
     public List<EmployeeSupport> getAllTickets() {
         List<EmployeeSupport> tickets = new ArrayList<>();
         try {
-            ApiFuture<QuerySnapshot> future = db.collection(COLLECTION_NAME).get();
+            // Query with ordering by timestamp (if available) or ticketID (as fallback)
+            ApiFuture<QuerySnapshot> future = db.collection(COLLECTION_NAME)
+                    .orderBy("ticketID", Query.Direction.DESCENDING) // Assuming higher ticketID = newer
+                    .get();
+
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
             for (QueryDocumentSnapshot document : documents) {
                 tickets.add(new EmployeeSupport(
@@ -103,4 +107,7 @@ public class SupportFirestoreFunctions {
         }
         return tickets;
     }
+
+
+
 }
