@@ -172,9 +172,6 @@ public class CustomerMenuController implements Initializable {
             e.printStackTrace();
         }
     }
-        // Set up event handlers for buttons
-        setupEventHandlers();
-  
 
     /**
      * Set up event handlers for all buttons
@@ -294,7 +291,6 @@ public class CustomerMenuController implements Initializable {
         alert.showAndWait();
     }
 
-}
 
     private void showError(String message) {
         javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
