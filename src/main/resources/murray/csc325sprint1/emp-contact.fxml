@@ -4,33 +4,40 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="516.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="murray.csc325sprint1.ViewModel.empContactController">
+<AnchorPane prefHeight="516.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="murray.csc325sprint1.ViewModel.empContactController">
     <children>
         <BorderPane layoutX="183.0" layoutY="73.0" prefHeight="516.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <top>
-                <AnchorPane prefHeight="95.0" prefWidth="600.0" style="-fx-background-color: #27527E;" BorderPane.alignment="CENTER">
+                <AnchorPane prefHeight="95.0" prefWidth="600.0" style="-fx-background-color: #ffffff;" BorderPane.alignment="CENTER">
                     <children>
-                        <Button fx:id="empGoBackBtn" layoutX="516.0" layoutY="18.0" mnemonicParsing="false" onAction="#handleEmpGoBackBtnClicked" text="Go Back" textFill="WHITE" />
-                        <Label layoutX="179.0" layoutY="30.0" prefHeight="35.0" prefWidth="112.0" style="-fx-font-weight: bold;" text="Contacts" textAlignment="JUSTIFY" textFill="#fdfafa">
+                        <Button fx:id="empGoBackBtn" layoutX="516.0" layoutY="18.0" mnemonicParsing="false" onAction="#handleEmpGoBackBtnClicked" style="-fx-background-color: #FFFFFF; -fx-border-color: #cdc6bd;" text="Go Back" textFill="#111111" />
+                        <Label layoutX="233.0" layoutY="27.0" prefHeight="41.0" prefWidth="134.0" style="-fx-font-weight: bold;" text="Contacts" textAlignment="JUSTIFY">
                             <font>
-                                <Font size="24.0" />
+                                <Font size="31.0" />
                             </font>
                         </Label>
+                  <ImageView fx:id="imageViewMainMenu" fitHeight="95.0" fitWidth="154.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../images/JackCateringLogo.png" />
+                     </image>
+                  </ImageView>
                     </children>
                 </AnchorPane>
             </top>
             <center>
-                <TableView fx:id="requestsTable" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                <TableView fx:id="requestsTable" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #cdc6bd;" BorderPane.alignment="CENTER">
                     <columns>
                         <TableColumn fx:id="userColumn" prefWidth="100.0" text="USER" />
                         <TableColumn fx:id="subjectColumn" prefWidth="150.0" text="SUBJECT" />
                         <TableColumn fx:id="TicketIDColumn" prefWidth="75.0" text="TICKET ID" />
-                        <TableColumn fx:id="statusColumn" prefWidth="75.0" text="STATUS" />
-                        <TableColumn fx:id="actionColumn" prefWidth="75.0" text="ACTION" />
+                        <TableColumn fx:id="statusColumn" prefWidth="118.0" text="STATUS" />
+                        <TableColumn fx:id="actionColumn" prefWidth="156.0" text="ACTION" />
                     </columns>
                 </TableView>
             </center>
