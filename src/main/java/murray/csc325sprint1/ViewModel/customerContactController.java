@@ -52,11 +52,6 @@ public class customerContactController {
 
     @FXML
     void handleViewRequest(ActionEvent event) {
-        if (currentTicketID == -1) {
-            showAlert("Error", "No ticket has been created yet!");
-            return;
-        }
-
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/murray/csc325sprint1/customer-view-request.fxml"));
             Parent root = loader.load();
