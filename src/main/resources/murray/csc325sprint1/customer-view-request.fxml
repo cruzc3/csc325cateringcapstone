@@ -29,7 +29,7 @@
          </font>
       </TextArea>
       <TextArea fx:id="SubjectTA" editable="false" layoutX="92.0" layoutY="16.0" prefHeight="38.0" prefWidth="423.0" promptText="Subject..." />
-      <Button fx:id="backButton" layoutX="22.0" layoutY="361.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="69.0" text="Go Back" />
+      <Button fx:id="backButton" layoutX="10.0" layoutY="360.0" onAction="#handleBackButton" text="Go Back" />
       <Label layoutX="14.0" layoutY="173.0" prefHeight="26.0" prefWidth="51.0" text="Status:">
          <font>
             <Font name="System Bold" size="12.0" />
