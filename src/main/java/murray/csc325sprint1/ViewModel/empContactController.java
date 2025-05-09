@@ -97,20 +97,14 @@ public class empContactController {
         requestsTable.setItems(tickets);
     }
 
-
-
-
-
     @FXML
     private void handleEmpGoBackBtnClicked() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/murray/csc325sprint1/emp-main.fxml"));
-            Parent root = loader.load();
-            Stage currStage = (Stage) empGoBackBtn.getScene().getWindow();
-            currStage.setScene(new Scene(root));
-        } catch (IOException e) {
+            Stage currentStage = (Stage) empGoBackBtn.getScene().getWindow();
+            currentStage.close();
+        } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Error", "Failed to load employee main screen");
+            showAlert("Error", "Failed to go back to the main screen.");
         }
     }
 
