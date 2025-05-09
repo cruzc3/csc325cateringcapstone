@@ -52,7 +52,9 @@ public class SupportFirestoreFunctions {
             Map<String, Object> update = new HashMap<>();
             update.put("response", response);
             update.put("isClosed", true);
-            db.collection(COLLECTION_NAME).document(String.valueOf(ticketID)).update(update).get();
+            ApiFuture<WriteResult> future = db.collection(COLLECTION_NAME).document(String.valueOf(ticketID)).update(update);
+            future.get();
+            System.out.println("Ticket updated: " + ticketID);
         } catch (Exception e) {
             System.err.println("Error while updating response: " + e.getMessage());
             e.printStackTrace();

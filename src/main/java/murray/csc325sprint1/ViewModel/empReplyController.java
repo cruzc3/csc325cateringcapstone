@@ -43,21 +43,19 @@ public class empReplyController {
             showAlert("Error", "Response cannot be empty!");
             return;
         }
-
+        currentTicket.setResponse(response);
+        currentTicket.setClosed(true);
         firestore.updateResponse(currentTicket.getTicketID(), response);
         showAlert("Success", "Response sent successfully!");
         closeWindow();
     }
 
     @FXML
-    private void handleBackButton() {
-        closeWindow();
-    }
-
-    private void closeWindow() {
-        Stage stage = (Stage) backButton.getScene().getWindow();
+    private void closeWindow(){
+        Stage stage = (Stage) empResponseTF.getScene().getWindow();
         stage.close();
     }
+
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
