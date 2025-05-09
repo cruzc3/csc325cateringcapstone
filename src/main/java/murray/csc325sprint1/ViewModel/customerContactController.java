@@ -17,12 +17,32 @@ public class customerContactController {
     @FXML private TextArea EnterMessage;
     @FXML private TextField EnterSubject;
     @FXML private TextField EnterUsernameTF;
+    @FXML private Button goBackButton;
     @FXML private Button sendButton;
     @FXML private Button viewRequest;
     @FXML private Label yourUsernameLabel;
 
     private final SupportFirestoreFunctions firestore = SupportFirestoreFunctions.getInstance();
     private int currentTicketID = -1;
+
+    @FXML
+    private void handleGoBackButton() {
+        try {
+
+            Stage currentStage = (Stage) goBackButton.getScene().getWindow();
+            currentStage.close();
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/murray/csc325sprint1/customer-main.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Error", "Failed to go back to main menu");
+        }
+    }
 
     @FXML
     void handleSendButton(ActionEvent event) {
