@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<GridPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="391.0" minWidth="704.0" prefHeight="425.0" prefWidth="704.0" style="-fx-background-color: #BC9A6E;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="murray.csc325sprint1.ViewModel.CreateUserController">
+<GridPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="391.0" minWidth="704.0" prefHeight="465.0" prefWidth="704.0" style="-fx-background-color: #BC9A6E;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="murray.csc325sprint1.ViewModel.CreateUserController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="295.20001220703125" minWidth="10.0" prefWidth="182.59998779296876" />
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="295.20001220703125" minWidth="10.0" prefWidth="189.6000244140625" />
@@ -30,6 +30,7 @@
         <RowConstraints minHeight="10.0" prefHeight="35.0" />
         <RowConstraints minHeight="10.0" prefHeight="35.0" />
         <RowConstraints minHeight="10.0" prefHeight="35.0" />
+        <RowConstraints maxHeight="35.0" minHeight="10.0" prefHeight="35.0" />
         <RowConstraints maxHeight="35.0" minHeight="10.0" prefHeight="35.0" />
         <RowConstraints maxHeight="35.0" minHeight="10.0" prefHeight="35.0" />
         <RowConstraints maxHeight="35.0" minHeight="10.0" prefHeight="35.0" />
@@ -101,6 +102,16 @@
                         <Font size="14.0" />
                     </font>
                 </TextField>
+            </children>
+        </HBox>
+        <!-- Employee Checkbox -->
+        <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="9">
+            <children>
+                <CheckBox fx:id="isEmployeeCB" mnemonicParsing="false" text="Register as Employee (for testing)">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </CheckBox>
             </children>
         </HBox>
         <VBox alignment="TOP_RIGHT" prefHeight="200.0" prefWidth="222.0" GridPane.rowIndex="1" GridPane.rowSpan="5">
@@ -185,7 +196,7 @@
                 </Label>
             </children>
         </HBox>
-        <HBox alignment="CENTER_LEFT" prefHeight="96.0" prefWidth="278.0" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="9">
+        <HBox alignment="CENTER_LEFT" prefHeight="96.0" prefWidth="278.0" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="10">
             <children>
                 <Hyperlink alignment="CENTER_RIGHT" onAction="#termsAndConditionHyperlinkClicked" prefHeight="26.0" prefWidth="157.0" text="Terms and Conditions  ">
                     <font>
@@ -200,7 +211,7 @@
             </children>
         </HBox>
         <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-        <HBox alignment="CENTER" prefHeight="35.0" prefWidth="107.0" GridPane.rowIndex="9">
+        <HBox alignment="CENTER" prefHeight="35.0" prefWidth="107.0" GridPane.rowIndex="10">
             <children>
                 <Button mnemonicParsing="false" onAction="#backBtnClciked" prefHeight="45.0" prefWidth="87.0" style="-fx-background-radius: 100; -fx-background-color: #b64201;" text="Back" textFill="WHITE">
                     <font>
@@ -209,6 +220,6 @@
                 </Button>
             </children>
         </HBox>
-        <CheckBox fx:id="agreeCB" disable="true" mnemonicParsing="false" prefHeight="24.0" prefWidth="234.0" text="Check to confirm and you agree to the " GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="9" />
+        <CheckBox fx:id="agreeCB" disable="true" mnemonicParsing="false" prefHeight="24.0" prefWidth="234.0" text="Check to confirm and you agree to the " GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="10" />
     </children>
 </GridPane>
