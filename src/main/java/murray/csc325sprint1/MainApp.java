@@ -10,7 +10,7 @@ import murray.csc325sprint1.Model.ViewPaths;
 import java.io.IOException;
 
 /**
- * Main application class for CAK Catering
+ * Main application class for Jack's Catering
  */
 public class MainApp extends Application {
 
@@ -29,7 +29,7 @@ public class MainApp extends Application {
             Scene scene = new Scene(root);
 
             // Configure the stage
-            primaryStage.setTitle("CAK Catering");
+            primaryStage.setTitle("Jack's Catering");
             primaryStage.setScene(scene);
             primaryStage.setMinWidth(800);
             primaryStage.setMinHeight(600);
