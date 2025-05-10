@@ -18,30 +18,12 @@
             <children>
                 <VBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="400.0">
                     <children>
-                        <HBox alignment="CENTER_LEFT" spacing="0.0">
-                            <children>
-                                <Label text="C" textFill="#ff6347">
-                                    <font>
-                                        <Font name="System Bold" size="32.0" />
-                                    </font>
-                                </Label>
-                                <Label text="A" textFill="#4caf50">
-                                    <font>
-                                        <Font name="System Bold" size="32.0" />
-                                    </font>
-                                </Label>
-                                <Label text="K" textFill="#2196f3">
-                                    <font>
-                                        <Font name="System Bold" size="32.0" />
-                                    </font>
-                                </Label>
-                            </children>
-                        </HBox>
-                        <Label text="Catering" textFill="#666666">
-                            <font>
-                                <Font name="System Italic" size="24.0" />
-                            </font>
-                        </Label>
+                        <!-- Replaced CAK branding with Jack's Catering logo -->
+                        <ImageView fitHeight="100.0" fitWidth="206.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../../images/JackCateringLogo.png" />
+                            </image>
+                        </ImageView>
                     </children>
                     <padding>
                         <Insets left="20.0" />
