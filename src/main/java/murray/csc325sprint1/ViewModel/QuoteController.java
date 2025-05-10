@@ -1,4 +1,4 @@
-package murray.csc325sprint1;
+package murray.csc325sprint1.ViewModel;
 
 import java.io.IOException;
 import java.net.URL;
@@ -23,17 +23,19 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import murray.csc325sprint1.MainApp;
+import murray.csc325sprint1.Menu;
+import murray.csc325sprint1.MenuItem;
+import murray.csc325sprint1.Order;
 
-
-public class OrderController implements Initializable {
+public class QuoteController implements Initializable {
 
     @FXML private VBox menuContainer;
     @FXML private Button cartBtn;
     @FXML private Button homeBtn;
 
-    private Order currentOrder;
+    private Order currentQuote;
     private Menu menuService;
-    private String userEmail;
 
     /**
      * Initialize the controller
@@ -43,20 +45,33 @@ public class OrderController implements Initializable {
         // Get the menu from MainApp
         menuService = MainApp.getMenu();
 
-        // Initialize the current order
-        currentOrder = new Order();
+        // Initialize the current quote
+        currentQuote = new Order();
 
         // Load menu items
         loadMenuItems();
 
-        // Set user email on the current order
-        currentOrder.setUserEmail(userEmail);
-
-        // Set up home button event handler (if it exists)
+        // Set up home button action if available
         if (homeBtn != null) {
-            homeBtn.setOnAction(event -> handleHomeButtonClick());
+            homeBtn.setOnAction(event -> navigateToCustomerMenu(event));
         }
+    }
 
+    /**
+     * Navigate back to customer menu
+     */
+    private void navigateToCustomerMenu(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/murray/csc325sprint1/customer-main.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) homeBtn.getScene().getWindow();
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Navigation Error", "Could not return to menu: " + e.getMessage());
+        }
     }
 
     /**
@@ -157,7 +172,7 @@ public class OrderController implements Initializable {
 
         // Set up add button action
         addButton.setOnAction(event -> {
-            currentOrder.addItem(item, 1);
+            currentQuote.addItem(item, 1);
             showAddedToCartAlert(item);
         });
 
@@ -177,43 +192,50 @@ public class OrderController implements Initializable {
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("Item Added");
         alert.setHeaderText(null);
-        alert.setContentText(item.getName() + " added to cart.");
+        alert.setContentText(item.getName() + " added to quote.");
         alert.showAndWait();
     }
 
     /**
-     * Show the order details dialog when the cart button is clicked
+     * Show a general alert
+     */
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    /**
+     * Show the quote details dialog when the cart button is clicked
      */
     @FXML
-    private void showOrderDetails(ActionEvent event) {
+    private void showQuoteDetails(ActionEvent event) {
         try {
-            // Check if there are items in the order
-            if (currentOrder.getOrderItems().isEmpty()) {
+            // Check if there are items in the quote
+            if (currentQuote.getOrderItems().isEmpty()) {
                 Alert alert = new Alert(AlertType.INFORMATION);
-                alert.setTitle("Empty Cart");
+                alert.setTitle("Empty Quote");
                 alert.setHeaderText(null);
-                alert.setContentText("Your cart is empty. Please add some items first.");
+                alert.setContentText("Your quote is empty. Please add some items first.");
                 alert.showAndWait();
                 return;
             }
 
-            // Try to load the dialog from different possible paths
-            URL fxmlLocation = getClass().getResource("/fxml/OrderDetailsDialog.fxml");
+            // Try to load the dialog
+            URL fxmlLocation = getClass().getResource("/murray/csc325sprint1/QuoteDetailsDialog.fxml");
             if (fxmlLocation == null) {
-                fxmlLocation = getClass().getResource("/murray/csc325sprint1/OrderDetailsDialog.fxml");
+                throw new IOException("Could not find QuoteDetailsDialog.fxml");
             }
 
-            if (fxmlLocation == null) {
-                throw new IOException("Could not find OrderDetailsDialog.fxml");
-            }
-
-            // Load the order details dialog
+            // Load the quote details dialog
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
 
-            // Get the controller and pass the current order
-            OrderDetailsController controller = loader.getController();
-            controller.setOrder(currentOrder);
+            // Get the controller and pass the current quote
+            QuoteDetailsController controller = loader.getController();
+            controller.setQuote(currentQuote);
 
             // Create a new stage for the dialog
             Stage dialogStage = new Stage();
@@ -222,65 +244,13 @@ public class OrderController implements Initializable {
             dialogStage.setScene(new Scene(root));
             dialogStage.showAndWait();
 
-            // Check if order was placed successfully
-            if (controller.isOrderPlaced()) {
-                // Reset the current order
-                currentOrder = new Order();
-
-                // Show success message
-                Alert alert = new Alert(AlertType.INFORMATION);
-                alert.setTitle("Order Placed");
-                alert.setHeaderText(null);
-                alert.setContentText("Your order has been placed successfully!");
-                alert.showAndWait();
-            }
-
         } catch (IOException e) {
             e.printStackTrace();
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText(null);
-            alert.setContentText("An error occurred while opening the order details: " + e.getMessage());
+            alert.setContentText("An error occurred while opening the quote details: " + e.getMessage());
             alert.showAndWait();
         }
     }
-
-    /**
-     * Set the user email (to be called from the login screen)
-     *
-     * @param email The user's email
-     */
-    public void setUserEmail(String email) {
-        this.userEmail = email;
-
-        // When we create the current order, also set the user email
-        if (currentOrder != null) {
-            currentOrder.setUserEmail(userEmail);
-        }
-    }
-
-    /**
-     * Add a button and handler to navigate back to the customer menu
-     */
-    @FXML
-    private void handleHomeButtonClick() {
-        try {
-            // Navigate back to customer menu
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/murray/csc325sprint1/customer-main.fxml"));
-            Parent root = loader.load();
-
-            Scene scene = new Scene(root);
-            Stage stage = (Stage) cartBtn.getScene().getWindow();
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(null);
-            alert.setContentText("Failed to navigate to home: " + e.getMessage());
-            alert.showAndWait();
-        }
-    }
-
 }

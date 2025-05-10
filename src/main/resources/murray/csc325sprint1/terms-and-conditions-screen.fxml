@@ -12,9 +12,9 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane fx:id="TCBP" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="473.0" prefWidth="663.0" style="-fx-background-color: #BC9A6E;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="murray.csc325sprint1.ViewModel.TermsAndConditionsController">
+<BorderPane fx:id="tCBP" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="663.0" style="-fx-background-color: #BC9A6E;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="murray.csc325sprint1.ViewModel.TermsAndConditionsController">
    <bottom>
-      <HBox fx:id="answerBtnContainer" alignment="CENTER" prefHeight="81.0" prefWidth="614.0" spacing="125.0" BorderPane.alignment="CENTER">
+      <HBox fx:id="answerBtnContainer" alignment="CENTER" prefHeight="102.0" prefWidth="663.0" spacing="125.0" BorderPane.alignment="CENTER">
          <children>
             <Button fx:id="disagreeBtn" alignment="CENTER" disable="true" mnemonicParsing="false" onAction="#disagreenTermsAndCondiitonBtnClicked" prefHeight="60.0" prefWidth="164.0" style="-fx-background-radius: 100; -fx-background-color: #b64201;" text="Disagree" textFill="#f2e8d3">
                <font>

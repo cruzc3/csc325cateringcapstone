@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="murray.csc325sprint1.ViewModel.OrderController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="murray.csc325sprint1.ViewModel.QuoteController">
     <top>
         <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <children>
@@ -49,7 +49,7 @@
                 </VBox>
                 <VBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="400.0">
                     <children>
-                        <Label text="Place an Order" textFill="#888888">
+                        <Label text="Get a Quote" textFill="#888888">
                             <font>
                                 <Font size="32.0" />
                             </font>
@@ -83,13 +83,13 @@
                     <graphic>
                         <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
                             <image>
-                                <Image url="@../images/home_icon.png" />
+                                <Image url="@../../images/backIcon.png" />
                             </image>
                         </ImageView>
                     </graphic>
                 </Button>
                 <Region HBox.hgrow="ALWAYS" />
-                <Button fx:id="cartBtn" mnemonicParsing="false" onAction="#showOrderDetails" style="-fx-background-color: transparent;">
+                <Button fx:id="cartBtn" mnemonicParsing="false" onAction="#showQuoteDetails" style="-fx-background-color: transparent;">
                     <graphic>
                         <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
                             <image>

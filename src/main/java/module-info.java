@@ -10,6 +10,7 @@ module murray.csc325sprint1 {
     requires java.desktop;
     requires jbcrypt;
     requires java.sql;
+    requires proto.google.cloud.firestore.v1;
 
     // Open package to FXML
     opens murray.csc325sprint1 to javafx.fxml;

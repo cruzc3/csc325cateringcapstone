@@ -1,5 +1,9 @@
 package murray.csc325sprint1;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +15,9 @@ public class Order {
     private String pickupDate;
     private String pickupTime;
     private String orderStatus; // Pending, Confirmed, Ready, Picked Up, Cancelled
+
+    // New field for user email
+    private String userEmail;
 
     /**
      * Default constructor
@@ -28,6 +35,8 @@ public class Order {
      * @param quantity The quantity to add
      */
     public void addItem(MenuItem item, int quantity) {
+        if (quantity <= 0) return; // Don't add negative or zero quantities
+
         String itemName = item.getName();
 
         // If the item is already in the order, increase the quantity
@@ -43,12 +52,46 @@ public class Order {
     }
 
     /**
+     * Update an item's quantity directly
+     *
+     * @param item The menu item to update
+     * @param newQuantity The new quantity to set
+     * @return true if updated, false if not found
+     */
+    public boolean updateItemQuantity(MenuItem item, int newQuantity) {
+        String itemName = item.getName();
+
+        if (!orderItems.containsKey(itemName)) {
+            return false;
+        }
+
+        int currentQuantity = orderItems.get(itemName);
+
+        if (newQuantity <= 0) {
+            // Remove the item completely
+            orderItems.remove(itemName);
+            orderTotal -= item.getPrice() * currentQuantity;
+        } else {
+            // Calculate the difference and update total
+            int difference = newQuantity - currentQuantity;
+            orderTotal += item.getPrice() * difference;
+
+            // Update the quantity
+            orderItems.put(itemName, newQuantity);
+        }
+
+        return true;
+    }
+
+    /**
      * Remove an item from the order
      *
      * @param item The menu item to remove
      * @param quantity The quantity to remove
      */
     public void removeItem(MenuItem item, int quantity) {
+        if (quantity <= 0) return; // Don't remove negative or zero quantities
+
         String itemName = item.getName();
 
         if (orderItems.containsKey(itemName)) {
@@ -81,6 +124,58 @@ public class Order {
      */
     public String getFormattedTotal() {
         return String.format("$%.2f", orderTotal);
+    }
+
+    /**
+     * Get the user email
+     *
+     * @return The user email
+     */
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    /**
+     * Set the user email
+     *
+     * @param userEmail The user email
+     */
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
+
+    /**
+     * Check if the order can be modified (more than 24 hours before pickup)
+     *
+     * @return true if the order can be modified, false otherwise
+     */
+    public boolean canBeModified() {
+        // If order is already cancelled or completed, it cannot be modified
+        if (orderStatus.equals("Cancelled") || orderStatus.equals("Completed")) {
+            return false;
+        }
+
+        try {
+            // Parse date and time
+            LocalDate date = LocalDate.parse(pickupDate);
+
+            // Parse time using pattern like "10:30 AM"
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("h:mm a");
+            LocalTime time = LocalTime.parse(pickupTime, timeFormatter);
+
+            // Combine into LocalDateTime
+            LocalDateTime pickupDateTime = LocalDateTime.of(date, time);
+
+            // Check if current time is more than 24 hours before pickup
+            LocalDateTime currentTime = LocalDateTime.now();
+            LocalDateTime cutoffTime = pickupDateTime.minusHours(24);
+
+            return currentTime.isBefore(cutoffTime);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     // Getters and setters
