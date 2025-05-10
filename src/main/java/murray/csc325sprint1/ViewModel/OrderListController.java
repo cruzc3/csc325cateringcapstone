@@ -1,9 +1,8 @@
 package murray.csc325sprint1.ViewModel;
 
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -14,9 +13,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import murray.csc325sprint1.FirestoreContext;
 import murray.csc325sprint1.MainApp;
@@ -34,8 +33,9 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import javafx.scene.Parent;
 
 public class OrderListController implements Initializable {
@@ -57,6 +57,9 @@ public class OrderListController implements Initializable {
 
     @FXML
     private TableColumn<OrderListItem, String> statusColumn;
+
+    @FXML
+    private TableColumn<OrderListItem, String> itemsColumn; // New column for order items
 
     @FXML
     private TableColumn<OrderListItem, String> actionsColumn;
@@ -100,6 +103,9 @@ public class OrderListController implements Initializable {
         totalColumn.setCellValueFactory(new PropertyValueFactory<>("total"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
+        // Set up the items column with a custom cell factory
+        setupItemsColumn();
+
         // Setup the actions column
         setupActionsColumn();
 
@@ -124,6 +130,113 @@ public class OrderListController implements Initializable {
                 stage.centerOnScreen();
             }
         });
+    }
+
+    /**
+     * Set up the items column to display order items with quantities
+     */
+    private void setupItemsColumn() {
+        itemsColumn.setCellValueFactory(cellData -> {
+            OrderListItem order = cellData.getValue();
+            Map<String, Integer> items = order.getOrderItems();
+
+            if (items == null || items.isEmpty()) {
+                return new SimpleStringProperty("No items");
+            }
+
+            // Create a nicely formatted string of items with quantities
+            String itemsList = items.entrySet().stream()
+                    .map(entry -> entry.getValue() + " × " + entry.getKey())
+                    .collect(Collectors.joining(", "));
+
+            return new SimpleStringProperty(itemsList);
+        });
+
+        // Add a button to show details in a popup for better viewing of long item lists
+        itemsColumn.setCellFactory(column -> {
+            return new TableCell<OrderListItem, String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+
+                    if (empty || item == null) {
+                        setText(null);
+                        setGraphic(null);
+                        return;
+                    }
+
+                    if (item.length() > 50) {
+                        // If text is long, display a truncated version with a "View" button
+                        HBox container = new HBox(5);
+
+                        Label itemsLabel = new Label(item.substring(0, 47) + "...");
+                        Button viewBtn = new Button("View");
+                        viewBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+
+                        viewBtn.setOnAction(event -> {
+                            OrderListItem orderItem = getTableView().getItems().get(getIndex());
+                            showItemsDetailsDialog(orderItem);
+                        });
+
+                        container.getChildren().addAll(itemsLabel, viewBtn);
+                        setGraphic(container);
+                        setText(null);
+                    } else {
+                        // If text is short enough, just display it
+                        setText(item);
+                        setGraphic(null);
+                    }
+                }
+            };
+        });
+    }
+
+    /**
+     * Show a dialog with detailed order items
+     */
+    private void showItemsDetailsDialog(OrderListItem order) {
+        try {
+            // Create dialog
+            Dialog<Void> dialog = new Dialog<>();
+            dialog.setTitle("Order Items");
+            dialog.setHeaderText("Items for Order #" + order.getOrderId());
+
+            // Create content
+            VBox content = new VBox(10);
+            content.setStyle("-fx-padding: 20;");
+
+            if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
+                // Create a list view to display items
+                ListView<String> itemsListView = new ListView<>();
+                ObservableList<String> items = FXCollections.observableArrayList();
+
+                for (Map.Entry<String, Integer> entry : order.getOrderItems().entrySet()) {
+                    items.add(entry.getValue() + " × " + entry.getKey());
+                }
+
+                itemsListView.setItems(items);
+                itemsListView.setPrefHeight(300);
+                itemsListView.setPrefWidth(400);
+
+                content.getChildren().add(itemsListView);
+            } else {
+                content.getChildren().add(new Label("No items in this order"));
+            }
+
+            // Add close button
+            ButtonType closeButton = new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE);
+            dialog.getDialogPane().getButtonTypes().add(closeButton);
+
+            // Set the content
+            dialog.getDialogPane().setContent(content);
+
+            // Show the dialog
+            dialog.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "Could not display order items: " + e.getMessage());
+        }
     }
 
     private void setupActionsColumn() {
@@ -180,13 +293,7 @@ public class OrderListController implements Initializable {
                 List<Order> allOrders = orderService.getAllOrders();
 
                 for (Order order : allOrders) {
-                    OrderListItem orderItem = new OrderListItem(
-                            order.getOrderId(),
-                            order.getPickupDate(),
-                            order.getPickupTime(),
-                            String.format("$%.2f", order.getOrderTotal()),
-                            order.getOrderStatus()
-                    );
+                    OrderListItem orderItem = createOrderListItemFromOrder(order);
                     orders.add(orderItem);
                 }
             } else {
@@ -195,13 +302,7 @@ public class OrderListController implements Initializable {
                 List<Order> userOrders = orderService.getUserOrders(userEmail);
 
                 for (Order order : userOrders) {
-                    OrderListItem orderItem = new OrderListItem(
-                            order.getOrderId(),
-                            order.getPickupDate(),
-                            order.getPickupTime(),
-                            String.format("$%.2f", order.getOrderTotal()),
-                            order.getOrderStatus()
-                    );
+                    OrderListItem orderItem = createOrderListItemFromOrder(order);
                     orders.add(orderItem);
                 }
             }
@@ -223,6 +324,23 @@ public class OrderListController implements Initializable {
         }
     }
 
+    /**
+     * Create an OrderListItem from an Order with item details
+     */
+    private OrderListItem createOrderListItemFromOrder(Order order) {
+        OrderListItem orderItem = new OrderListItem(
+                order.getOrderId(),
+                order.getPickupDate(),
+                order.getPickupTime(),
+                String.format("$%.2f", order.getOrderTotal()),
+                order.getOrderStatus()
+        );
+
+        // Set the order items map (new field in OrderListItem class)
+        orderItem.setOrderItems(order.getOrderItems());
+
+        return orderItem;
+    }
 
     /**
      * Confirm and cancel an order
