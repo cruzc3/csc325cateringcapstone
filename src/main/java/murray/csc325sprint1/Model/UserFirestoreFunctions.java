@@ -93,16 +93,24 @@ public class UserFirestoreFunctions {
 
     public User findUser(String email) {
         try {
-            DocumentSnapshot snapshot = db.collection(USER_COLLECTION).document(email).get().get();
+            DocumentSnapshot snapshot = db.collection(USER_COLLECTION).document(email.toLowerCase()).get().get();
             if (snapshot.exists()) {
-                return new User(
+                User user = new User(
                         snapshot.getString("first name"),
                         snapshot.getString("last name"),
-                        snapshot.getString("email"),
+                        email, // Use the provided email to ensure case consistency
                         snapshot.getString("security question"),
                         snapshot.getString("security answer"),
                         snapshot.getString("password")
                 );
+
+                // Set employee status
+                Boolean isEmployee = snapshot.getBoolean("is employee");
+                if (isEmployee != null) {
+                    user.setEmployee(isEmployee);
+                }
+
+                return user;
             }
         } catch (Exception e) {
             System.err.println("Error finding user: " + e.getMessage());

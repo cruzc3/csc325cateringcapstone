@@ -18,6 +18,8 @@ import java.time.format.DateTimeFormatter;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
+import murray.csc325sprint1.Model.Util;
+import murray.csc325sprint1.Model.User;
 
 /**
  * Service for managing orders in the application
@@ -59,6 +61,17 @@ public class OrderService {
                 order.setOrderId(UUID.randomUUID().toString());
             }
 
+            // Get current user's email if not provided in the order
+            if (order.getUserEmail() == null || order.getUserEmail().isEmpty()) {
+                User currentUser = Util.getCurrentUser();
+                if (currentUser != null) {
+                    order.setUserEmail(currentUser.getEmail());
+                } else {
+                    System.err.println("No user email provided and no current user found");
+                    return false;
+                }
+            }
+
             // Convert order to a map for Firestore
             Map<String, Object> orderMap = new HashMap<>();
             orderMap.put("orderId", order.getOrderId());
@@ -68,8 +81,6 @@ public class OrderService {
             orderMap.put("pickupTime", order.getPickupTime());
             orderMap.put("orderStatus", order.getOrderStatus());
             orderMap.put("orderTimestamp", System.currentTimeMillis());
-
-            // Add user email
             orderMap.put("userEmail", order.getUserEmail());
 
             // Save to Firestore
@@ -155,6 +166,17 @@ public class OrderService {
                 return orders;
             }
 
+            // If no email provided, use current user's email
+            if (userEmail == null || userEmail.isEmpty()) {
+                User currentUser = Util.getCurrentUser();
+                if (currentUser != null) {
+                    userEmail = currentUser.getEmail();
+                } else {
+                    System.err.println("No user email provided and no current user found");
+                    return orders;
+                }
+            }
+
             QuerySnapshot querySnapshot = db.collection(ORDERS_COLLECTION)
                     .whereEqualTo("userEmail", userEmail)
                     .get()
@@ -167,6 +189,7 @@ public class OrderService {
                 order.setPickupTime(document.getString("pickupTime"));
                 order.setOrderTotal(document.getDouble("orderTotal"));
                 order.setOrderStatus(document.getString("orderStatus"));
+                order.setUserEmail(document.getString("userEmail"));
 
                 // Get order items
                 Map<String, Object> orderItems = (Map<String, Object>) document.get("orderItems");
@@ -184,6 +207,54 @@ public class OrderService {
 
         } catch (Exception e) {
             System.err.println("Error getting user orders: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return orders;
+    }
+
+    /**
+     * Get all orders (for employee view)
+     *
+     * @return List of all orders
+     */
+    public List<Order> getAllOrders() {
+        List<Order> orders = new ArrayList<>();
+
+        try {
+            if (db == null) {
+                System.err.println("Firestore not initialized");
+                return orders;
+            }
+
+            QuerySnapshot querySnapshot = db.collection(ORDERS_COLLECTION)
+                    .get()
+                    .get();
+
+            for (QueryDocumentSnapshot document : querySnapshot.getDocuments()) {
+                Order order = new Order();
+                order.setOrderId(document.getString("orderId"));
+                order.setPickupDate(document.getString("pickupDate"));
+                order.setPickupTime(document.getString("pickupTime"));
+                order.setOrderTotal(document.getDouble("orderTotal"));
+                order.setOrderStatus(document.getString("orderStatus"));
+                order.setUserEmail(document.getString("userEmail"));
+
+                // Get order items
+                Map<String, Object> orderItems = (Map<String, Object>) document.get("orderItems");
+                if (orderItems != null) {
+                    for (Map.Entry<String, Object> entry : orderItems.entrySet()) {
+                        String itemName = entry.getKey();
+                        Long quantity = (Long) entry.getValue();
+                        order.getOrderItems().put(itemName, quantity.intValue());
+                    }
+                }
+
+                orders.add(order);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error getting all orders: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -269,5 +340,4 @@ public class OrderService {
             return false;
         }
     }
-
 }

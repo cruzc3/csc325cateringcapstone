@@ -13,7 +13,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import murray.csc325sprint1.Model.User;
 import murray.csc325sprint1.Model.UserFirestoreFunctions;
+import murray.csc325sprint1.Model.Util;
 
 import java.io.IOException;
 
@@ -108,7 +110,7 @@ public class LoginScreenController {
 
     @FXML
     void loginBtnClicked(ActionEvent event) {
-        try{
+        try {
             String email = emailTF.getText().trim();
             String password = passwordPF.isVisible() ? passwordPF.getText().trim() : passwordTF.getText().trim();
             if (email.isEmpty() || password.isEmpty()) {
@@ -118,16 +120,27 @@ public class LoginScreenController {
             boolean isValid = instanceOfUserFirestore.verifyLogin(email, password);
             if (isValid) {
                 loginLbl.setText("Login successful!");
-//                [Change this to whatever container holds the next screen] AfterLoginPane = FXMLLoader.load(getClass().getResource());
-                instance.clearContent();
-//                instance.initScreenBorderPane.setCenter(AfterLoginPane);
+
+                // Get the user from the database
+                User user = instanceOfUserFirestore.findUser(email);
+                if (user != null) {
+                    // Store the current user for later reference
+                    Util.setCurrentUser(user);
+
+                    // Get the current stage
+                    Stage stage = (Stage) signInGridPane.getScene().getWindow();
+
+                    // Navigate to the appropriate menu based on user type
+                    Util.navigateToAppropriateMenu(stage, user);
+                } else {
+                    loginLbl.setText("User not found. Please try again.");
+                }
             } else {
                 loginLbl.setText("Invalid email or password.");
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            loginLbl.setText("Error during login: " + e.getMessage());
         }
-
     }
-
 }

@@ -28,6 +28,9 @@ public class CreateUserController {
     private CheckBox agreeCB;
 
     @FXML
+    private CheckBox isEmployeeCB; // New checkbox for employee status
+
+    @FXML
     private TextField cPasswordTF;
 
     @FXML
@@ -117,13 +120,23 @@ public class CreateUserController {
                 String password = passwordTF.getText().trim();
                 String confirmPassword = cPasswordTF.getText().trim();
                 if (!password.equals(confirmPassword)) {
-                    System.out.println("Passwords do not match.");
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Password Mismatch");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Passwords do not match. Please try again.");
+                    alert.showAndWait();
                     return;
                 }
                 if (!agreeCB.isSelected()) {
-                    System.out.println("You must agree to the terms.");
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Terms Not Accepted");
+                    alert.setHeaderText(null);
+                    alert.setContentText("You must agree to the terms and conditions to register.");
+                    alert.showAndWait();
                     return;
                 }
+
+                // Create new user with isEmployee checkbox value
                 User u = new User(
                         fNameTF.getText().trim(),
                         lNameTF.getText().trim(),
@@ -132,12 +145,30 @@ public class CreateUserController {
                         securityAnswerTF.getText().trim(),
                         passwordTF.getText().trim()
                 );
+
+                // Set employee status based on checkbox
+                if (isEmployeeCB != null && isEmployeeCB.isSelected()) {
+                    u.setEmployee(true);
+                }
+
                 instanceOfUserFirestore.insertUser(u);
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Registration Successful");
+                alert.setHeaderText(null);
+                alert.setContentText("Account created successfully. You can now log in.");
+                alert.showAndWait();
+
                 GridPane signInGridPane = FXMLLoader.load(getClass().getResource(LOGIN_SCREEN));
                 instance.clearContent();
                 instance.initScreenBorderPane.setCenter(signInGridPane);
             } catch (IOException e) {
                 e.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Registration Error");
+                alert.setHeaderText(null);
+                alert.setContentText("An error occurred during registration: " + e.getMessage());
+                alert.showAndWait();
             }
         }
     }
@@ -161,6 +192,5 @@ public class CreateUserController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }

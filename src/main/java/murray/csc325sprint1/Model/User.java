@@ -14,7 +14,21 @@ public class User {
         this.secQuestion = secQuestion;
         this.secAnswer = secAnswer;
         this.password = password;
-        this.employee = false;
+        this.employee = false; // Default to customer
+    }
+
+    /**
+     * Constructor with employee flag
+     */
+    public User(String fName, String lName, String email, String secQuestion, String secAnswer,
+                String password, boolean isEmployee) {
+        this.fName = fName;
+        this.lName = lName;
+        this.email = email;
+        this.secQuestion = secQuestion;
+        this.secAnswer = secAnswer;
+        this.password = password;
+        this.employee = isEmployee;
     }
 
     public String getfName() {
@@ -94,6 +108,7 @@ public class User {
                 ", secQuestion='" + secQuestion + '\'' +
                 ", secAnswer='" + secAnswer + '\'' +
                 ", password='" + password + '\'' +
+                ", isEmployee='" + employee + '\'' +
                 '}';
     }
 }
