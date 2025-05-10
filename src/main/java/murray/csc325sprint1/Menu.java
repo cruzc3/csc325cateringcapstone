@@ -22,23 +22,6 @@ public class Menu {
         db = FirestoreContext.getInstance().getFirestore();
         // Set up menu items
         setupMenuItems();
-        debugPrintMenuItems();
-    }
-
-    /**
-     * Debug method to print all menu items and their image paths
-     */
-    public void debugPrintMenuItems() {
-        System.out.println("\n===== MENU ITEMS DEBUG INFO =====");
-        List<MenuItem> items = getAllMenuItems();
-        System.out.println("Found " + items.size() + " menu items in database");
-
-        for (MenuItem item : items) {
-            System.out.println("Item: " + item.getName());
-            System.out.println("  Category: " + item.getCategory());
-            System.out.println("  Image Path: " + item.getImagePath());
-        }
-        System.out.println("================================\n");
     }
 
     /**
