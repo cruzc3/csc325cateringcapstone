@@ -66,6 +66,12 @@ public class OrderListController implements Initializable {
     @FXML
     private Label noOrdersLabel;
 
+    @FXML
+    private Button backBtn;
+
+    @FXML
+    private Button refreshBtn;
+
     private OrderService orderService;
     private Firestore db;
     private ObservableList<OrderListItem> ordersList;
@@ -106,18 +112,11 @@ public class OrderListController implements Initializable {
                     @Override
                     public TableCell<OrderListItem, String> call(final TableColumn<OrderListItem, String> param) {
                         return new TableCell<>() {
-                            private final Button editButton = new Button("Edit");
                             private final Button cancelButton = new Button("Cancel");
-                            private final HBox buttonsBox = new HBox(5, editButton, cancelButton);
+                            private final HBox buttonsBox = new HBox(5, cancelButton);
 
                             {
-                                editButton.setStyle("-fx-background-color: #4caf50; -fx-text-fill: white;");
                                 cancelButton.setStyle("-fx-background-color: #ff6347; -fx-text-fill: white;");
-
-                                editButton.setOnAction(event -> {
-                                    OrderListItem order = getTableView().getItems().get(getIndex());
-                                    openEditOrderDialog(order);
-                                });
 
                                 cancelButton.setOnAction(event -> {
                                     OrderListItem order = getTableView().getItems().get(getIndex());
@@ -138,7 +137,6 @@ public class OrderListController implements Initializable {
                                 boolean canModify = canModifyOrder(order);
 
                                 // Disable buttons if order cannot be modified
-                                editButton.setDisable(!canModify);
                                 cancelButton.setDisable(!canModify);
 
                                 setGraphic(buttonsBox);
@@ -207,29 +205,6 @@ public class OrderListController implements Initializable {
 
 
     /**
-     * Open the edit order dialog
-     */
-    private void openEditOrderDialog(OrderListItem orderItem) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(ViewPaths.ORDER_EDIT_DIALOG_SCREEN));
-            Parent root = loader.load();
-
-            OrderEditController controller = loader.getController();
-            controller.initData(orderItem, this);
-
-            Stage dialogStage = new Stage();
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.initStyle(StageStyle.DECORATED);
-            dialogStage.setTitle("Edit Order #" + orderItem.getOrderId());
-            dialogStage.setScene(new Scene(root));
-            dialogStage.showAndWait();
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Error", "Failed to open edit dialog: " + e.getMessage());
-        }
-    }
-
-    /**
      * Confirm and cancel an order
      */
     private void confirmCancelOrder(OrderListItem order) {
@@ -269,7 +244,7 @@ public class OrderListController implements Initializable {
     }
 
     /**
-     * Go to the home screen
+     * Go back to the home/main menu
      */
     @FXML
     private void goToHome(ActionEvent event) {
@@ -278,13 +253,17 @@ public class OrderListController implements Initializable {
             String fxmlPath = isEmployeeView ? ViewPaths.EMPLOYEE_MAIN_SCREEN : ViewPaths.CUSTOMER_MAIN_SCREEN;
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Scene scene = new Scene(loader.load());
-            Stage stage = (Stage) ordersTableView.getScene().getWindow();
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+
+            // Get the stage from the back button
+            Stage stage = (Stage) backBtn.getScene().getWindow();
             stage.setScene(scene);
+            stage.show();
 
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Error", "Failed to navigate to home: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to navigate back to main menu: " + e.getMessage());
         }
     }
 

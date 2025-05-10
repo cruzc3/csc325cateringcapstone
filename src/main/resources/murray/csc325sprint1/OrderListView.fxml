@@ -86,11 +86,11 @@
                 <TableView fx:id="ordersTableView" prefHeight="350.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                     <columns>
                         <TableColumn fx:id="orderIdColumn" prefWidth="120.0" text="Order ID" />
-                        <TableColumn fx:id="pickupDateColumn" prefWidth="120.0" text="Pickup Date" />
-                        <TableColumn fx:id="pickupTimeColumn" prefWidth="120.0" text="Pickup Time" />
+                        <TableColumn fx:id="pickupDateColumn" prefWidth="150.0" text="Pickup Date" />
+                        <TableColumn fx:id="pickupTimeColumn" prefWidth="140.0" text="Pickup Time" />
                         <TableColumn fx:id="totalColumn" prefWidth="120.0" text="Total" />
                         <TableColumn fx:id="statusColumn" prefWidth="120.0" text="Status" />
-                        <TableColumn fx:id="actionsColumn" prefWidth="180.0" text="Actions" />
+                        <TableColumn fx:id="actionsColumn" prefWidth="130.0" text="Actions" />
                     </columns>
                     <VBox.margin>
                         <Insets bottom="10.0" left="20.0" right="20.0" />
@@ -110,14 +110,13 @@
     <bottom>
         <HBox alignment="CENTER" prefHeight="60.0" prefWidth="200.0" spacing="20.0" BorderPane.alignment="CENTER">
             <children>
-                <Button fx:id="homeBtn" mnemonicParsing="false" onAction="#goToHome" style="-fx-background-color: transparent;">
-                    <graphic>
-                        <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
-                            <image>
-                                <Image url="@../images/home_icon.png" />
-                            </image>
-                        </ImageView>
-                    </graphic>
+                <Button fx:id="backBtn" mnemonicParsing="false" onAction="#goToHome" style="-fx-background-color: #ff6347; -fx-text-fill: white; -fx-background-radius: 5;" text="Back to Menu">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                    <padding>
+                        <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
+                    </padding>
                 </Button>
                 <Button fx:id="refreshBtn" mnemonicParsing="false" onAction="#refreshOrders" style="-fx-background-color: transparent;">
                     <graphic>
@@ -127,14 +126,6 @@
                             </image>
                         </ImageView>
                     </graphic>
-                </Button>
-                <Button fx:id="newOrderBtn" mnemonicParsing="false" onAction="#createNewOrder" style="-fx-background-color: #4caf50; -fx-text-fill: white; -fx-background-radius: 5;" text="Place New Order">
-                    <font>
-                        <Font size="14.0" />
-                    </font>
-                    <padding>
-                        <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
-                    </padding>
                 </Button>
             </children>
             <padding>
