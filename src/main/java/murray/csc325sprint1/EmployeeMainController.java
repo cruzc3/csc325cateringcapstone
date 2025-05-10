@@ -12,7 +12,8 @@ import javafx.stage.Stage;
 import murray.csc325sprint1.Model.User;
 import murray.csc325sprint1.Model.Util;
 import murray.csc325sprint1.Model.ViewPaths;
-
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -64,23 +65,28 @@ public class EmployeeMainController implements Initializable {
         // Initialize contact button functionality
         EmpContact.setOnAction(event -> ContactBtnClicked());
 
-        // Initialize logout button functionality
+        // Initialize logout button functionality - simply close the application
         EmpLogOut.setOnAction(event -> {
             try {
-                // Clear current user
+                // Clear current user session
                 Util.setCurrentUser(null);
 
-                // Return to login screen
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(ViewPaths.INIT_SCREEN));
-                Parent root = loader.load();
-                Stage stage = (Stage) EmpLogOut.getScene().getWindow();
-                Scene scene = new Scene(root);
-                stage.setScene(scene);
-                stage.show();
+                // Get the current stage
+                Stage currentStage = (Stage) EmpLogOut.getScene().getWindow();
 
-                // Ensure proper sizing after loading
-                adjustStageSize(stage);
-            } catch (IOException e) {
+                // Show confirmation dialog
+                Alert confirmExit = new Alert(Alert.AlertType.CONFIRMATION);
+                confirmExit.setTitle("Log Out");
+                confirmExit.setHeaderText("Log Out");
+                confirmExit.setContentText("Are you sure you want to log out and exit the application?");
+
+                if (confirmExit.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+                    // Close the application
+                    currentStage.close();
+                    // Optionally force exit the application
+                    // Platform.exit();
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
                 showError("Error logging out: " + e.getMessage());
             }
