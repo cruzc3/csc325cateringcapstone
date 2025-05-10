@@ -22,6 +22,23 @@ public class Menu {
         db = FirestoreContext.getInstance().getFirestore();
         // Set up menu items
         setupMenuItems();
+        debugPrintMenuItems();
+    }
+
+    /**
+     * Debug method to print all menu items and their image paths
+     */
+    public void debugPrintMenuItems() {
+        System.out.println("\n===== MENU ITEMS DEBUG INFO =====");
+        List<MenuItem> items = getAllMenuItems();
+        System.out.println("Found " + items.size() + " menu items in database");
+
+        for (MenuItem item : items) {
+            System.out.println("Item: " + item.getName());
+            System.out.println("  Category: " + item.getCategory());
+            System.out.println("  Image Path: " + item.getImagePath());
+        }
+        System.out.println("================================\n");
     }
 
     /**
@@ -45,22 +62,22 @@ public class Menu {
             System.out.println("Initializing menu items in Firebase...");
 
             // Create appetizers
-            addMenuItem("Mini Crab Cakes", 48.0, "Bite-sized crab cakes made with lump crab meat, herbs, and spices", "appetizer", "dozen");
-            addMenuItem("Arancini", 36.0, "Crispy fried risotto balls stuffed with mozzarella cheese and served with marinara dipping sauce", "appetizer", "dozen");
-            addMenuItem("Shrimp Cocktail", 54.0, "Fresh jumbo shrimp, chilled and served with zesty cocktail sauce", "appetizer", "dozen");
-            addMenuItem("Pulled Pork Sliders", 60.0, "Smoky BBQ pulled pork topped with coleslaw, served in soft brioche buns", "appetizer", "dozen");
-            addMenuItem("Caprese Skewers", 36.0, "Fresh mozzarella, cherry tomatoes, and basil leaves drizzled with a tangy balsamic glaze", "appetizer", "dozen");
-            addMenuItem("Vegan Spring Rolls", 42.0, "Fresh vegetable-filled rice paper rolls served with peanut or sweet chili sauce", "appetizer", "dozen");
+            addMenuItem("Mini Crab Cakes", 48.0, "Bite-sized crab cakes made with lump crab meat, herbs, and spices", "appetizer", "dozen", "/images/menu/crab_cakes.png");
+            addMenuItem("Arancini", 36.0, "Crispy fried risotto balls stuffed with mozzarella cheese and served with marinara dipping sauce", "appetizer", "dozen", "/images/menu/arancini.png");
+            addMenuItem("Shrimp Cocktail", 54.0, "Fresh jumbo shrimp, chilled and served with zesty cocktail sauce", "appetizer", "dozen", "/images/menu/shrimp_cocktail.png");
+            addMenuItem("Pulled Pork Sliders", 60.0, "Smoky BBQ pulled pork topped with coleslaw, served in soft brioche buns", "appetizer", "dozen", "/images/menu/pork_sliders.png");
+            addMenuItem("Caprese Skewers", 36.0, "Fresh mozzarella, cherry tomatoes, and basil leaves drizzled with a tangy balsamic glaze", "appetizer", "dozen", "/images/menu/caprese_skewers.png");
+            addMenuItem("Vegan Spring Rolls", 42.0, "Fresh vegetable-filled rice paper rolls served with peanut or sweet chili sauce", "appetizer", "dozen", "/images/menu/spring_rolls.png");
 
             // Add entrees
-            addMenuItem("Rosemary-Garlic Prime Rib", 225.0, "Slow-roasted prime rib crusted with fresh rosemary, garlic, and cracked black pepper, served with au jus, horseradish cream, and Yorkshire pudding.", "entree", "order");
-            addMenuItem("Herb-Crusted Salmon", 190.0, "Fresh Atlantic salmon fillets topped with a lemon-herb crust, roasted to perfection and served with dill cream sauce and charred lemon halves.", "entree", "order");
-            addMenuItem("Mediterranean Stuffed Chicken", 175.0, "Boneless chicken breasts stuffed with spinach, sun-dried tomatoes, and feta cheese, wrapped in prosciutto and served with a white wine and herb sauce.", "entree", "order");
+            addMenuItem("Rosemary-Garlic Prime Rib", 225.0, "Slow-roasted prime rib crusted with fresh rosemary, garlic, and cracked black pepper, served with au jus, horseradish cream, and Yorkshire pudding.", "entree", "order", "/images/menu/prime_rib.png");
+            addMenuItem("Herb-Crusted Salmon", 190.0, "Fresh Atlantic salmon fillets topped with a lemon-herb crust, roasted to perfection and served with dill cream sauce and charred lemon halves.", "entree", "order", "/images/menu/salmon.png");
+            addMenuItem("Mediterranean Stuffed Chicken", 175.0, "Boneless chicken breasts stuffed with spinach, sun-dried tomatoes, and feta cheese, wrapped in prosciutto and served with a white wine and herb sauce.", "entree", "order", "/images/menu/stuffed_chicken.png");
 
             // Add desserts
-            addMenuItem("French Macaron Tower", 95.0, "A stunning display of delicate French macarons in assorted flavors including raspberry, pistachio, chocolate, lemon, salted caramel, and lavender.", "dessert", "tower");
-            addMenuItem("Tiramisu Cups", 75.0, "Individual servings of classic tiramisu featuring espresso-soaked ladyfingers layered with mascarpone cream and dusted with cocoa powder.", "dessert", "order");
-            addMenuItem("Chocolate Ganache Tartlets", 65.0, "Buttery shortbread tart shells filled with rich dark chocolate ganache, topped with sea salt, gold leaf, and seasonal berries.", "dessert", "order");
+            addMenuItem("French Macaron Tower", 95.0, "A stunning display of delicate French macarons in assorted flavors including raspberry, pistachio, chocolate, lemon, salted caramel, and lavender.", "dessert", "tower", "/images/menu/macaron_tower.png");
+            addMenuItem("Tiramisu Cups", 75.0, "Individual servings of classic tiramisu featuring espresso-soaked ladyfingers layered with mascarpone cream and dusted with cocoa powder.", "dessert", "order", "/images/menu/tiramisu.png");
+            addMenuItem("Chocolate Ganache Tartlets", 65.0, "Buttery shortbread tart shells filled with rich dark chocolate ganache, topped with sea salt, gold leaf, and seasonal berries.", "dessert", "order", "/images/menu/chocolate_tart.png");
 
             System.out.println("Menu items initialized successfully");
 
@@ -78,8 +95,9 @@ public class Menu {
      * @param description Item description
      * @param category Item category (appetizer, entree, dessert)
      * @param unit Item unit (dozen, platter, order)
+     * @param imagePath Path to the item's image
      */
-    private void addMenuItem(String name, double price, String description, String category, String unit) {
+    private void addMenuItem(String name, double price, String description, String category, String unit, String imagePath) {
         try {
             Map<String, Object> menuItem = new HashMap<>();
             menuItem.put("name", name);
@@ -87,6 +105,7 @@ public class Menu {
             menuItem.put("description", description);
             menuItem.put("category", category);
             menuItem.put("unit", unit);
+            menuItem.put("imagePath", imagePath); // Store the image path
 
             String documentId = name.toLowerCase().replace(" ", "_");
             db.collection(MENU_COLLECTION).document(documentId).set(menuItem).get();
@@ -119,9 +138,15 @@ public class Menu {
                 String description = document.getString("description");
                 String category = document.getString("category");
                 String unit = document.getString("unit");
+                String imagePath = document.getString("imagePath");
+
+                // Use default image path if not provided
+                if (imagePath == null) {
+                    imagePath = "/images/food_placeholder.png";
+                }
 
                 if (name != null && price != null && description != null && category != null && unit != null) {
-                    MenuItem item = new MenuItem(name, price, description, category, unit);
+                    MenuItem item = new MenuItem(name, price, description, category, unit, imagePath);
                     menuItems.add(item);
                 }
             }
@@ -159,9 +184,15 @@ public class Menu {
                 Double price = document.getDouble("price");
                 String description = document.getString("description");
                 String unit = document.getString("unit");
+                String imagePath = document.getString("imagePath");
+
+                // Use default image path if not provided
+                if (imagePath == null) {
+                    imagePath = "/images/food_placeholder.png";
+                }
 
                 if (name != null && price != null && description != null && unit != null) {
-                    MenuItem item = new MenuItem(name, price, description, category, unit);
+                    MenuItem item = new MenuItem(name, price, description, category, unit, imagePath);
                     menuItems.add(item);
                 }
             }

@@ -79,7 +79,7 @@
     <bottom>
         <HBox alignment="CENTER" prefHeight="60.0" prefWidth="200.0" spacing="20.0" BorderPane.alignment="CENTER">
             <children>
-                <Button fx:id="backBtn" mnemonicParsing="false" onAction="#goBack" style="-fx-background-color: #CCCCCC;">
+                <Button fx:id="backBtn" mnemonicParsing="false" onAction="#goBack" style="-fx-background-color: transparent;" textFill="TRANSPARENT">
                     <graphic>
                         <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
                             <image>
