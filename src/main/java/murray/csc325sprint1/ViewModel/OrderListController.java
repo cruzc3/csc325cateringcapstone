@@ -3,6 +3,7 @@ package murray.csc325sprint1.ViewModel;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -104,6 +105,25 @@ public class OrderListController implements Initializable {
 
         // Load orders on initialization
         loadOrders();
+
+        // Ensure proper window sizing after UI is fully loaded
+        Platform.runLater(() -> {
+            if (ordersTableView.getScene() != null && ordersTableView.getScene().getWindow() instanceof Stage) {
+                Stage stage = (Stage) ordersTableView.getScene().getWindow();
+
+                // Force layout pass to calculate proper size
+                ordersTableView.getScene().getRoot().applyCss();
+                ordersTableView.getScene().getRoot().layout();
+
+                double prefWidth = ordersTableView.getScene().getRoot().prefWidth(-1);
+                double prefHeight = ordersTableView.getScene().getRoot().prefHeight(-1);
+
+                // Add a bit of padding
+                stage.setWidth(prefWidth + 20);
+                stage.setHeight(prefHeight + 20);
+                stage.centerOnScreen();
+            }
+        });
     }
 
     private void setupActionsColumn() {
@@ -259,6 +279,20 @@ public class OrderListController implements Initializable {
             // Get the stage from the back button
             Stage stage = (Stage) backBtn.getScene().getWindow();
             stage.setScene(scene);
+
+            // Ensure proper sizing after loading
+            Platform.runLater(() -> {
+                root.applyCss();
+                root.layout();
+                double prefWidth = root.prefWidth(-1);
+                double prefHeight = root.prefHeight(-1);
+
+                // Add a bit of padding
+                stage.setWidth(prefWidth + 20);
+                stage.setHeight(prefHeight + 20);
+                stage.centerOnScreen();
+            });
+
             stage.show();
 
         } catch (IOException e) {
@@ -275,9 +309,25 @@ public class OrderListController implements Initializable {
         try {
             // Navigate to the order view
             FXMLLoader loader = new FXMLLoader(getClass().getResource(ViewPaths.ORDER_VIEW_SCREEN));
-            Scene scene = new Scene(loader.load());
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
             Stage stage = (Stage) ordersTableView.getScene().getWindow();
             stage.setScene(scene);
+
+            // Ensure proper sizing after loading
+            Platform.runLater(() -> {
+                root.applyCss();
+                root.layout();
+                double prefWidth = root.prefWidth(-1);
+                double prefHeight = root.prefHeight(-1);
+
+                // Add a bit of padding
+                stage.setWidth(prefWidth + 20);
+                stage.setHeight(prefHeight + 20);
+                stage.centerOnScreen();
+            });
+
+            stage.show();
 
         } catch (IOException e) {
             e.printStackTrace();

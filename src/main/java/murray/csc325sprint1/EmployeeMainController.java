@@ -1,5 +1,6 @@
 package murray.csc325sprint1;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -49,6 +50,17 @@ public class EmployeeMainController implements Initializable {
             welcomeLabel.setText("Welcome, " + currentUser.getfName() + "!");
         }
 
+        // Ensure proper window resizing after scene is fully loaded
+        Platform.runLater(() -> {
+            Stage stage = (Stage) EmpContact.getScene().getWindow();
+            double width = stage.getScene().getRoot().prefWidth(-1);
+            double height = stage.getScene().getRoot().prefHeight(-1);
+
+            stage.setWidth(width);
+            stage.setHeight(height);
+            stage.centerOnScreen();
+        });
+
         // Initialize contact button functionality
         EmpContact.setOnAction(event -> ContactBtnClicked());
 
@@ -65,6 +77,9 @@ public class EmployeeMainController implements Initializable {
                 Scene scene = new Scene(root);
                 stage.setScene(scene);
                 stage.show();
+
+                // Ensure proper sizing after loading
+                adjustStageSize(stage);
             } catch (IOException e) {
                 e.printStackTrace();
                 showError("Error logging out: " + e.getMessage());
@@ -82,6 +97,9 @@ public class EmployeeMainController implements Initializable {
                 Stage stage = (Stage) EmpOrders.getScene().getWindow();
                 stage.setScene(scene);
                 stage.show();
+
+                // Ensure proper sizing after loading
+                adjustStageSize(stage);
             } catch (IOException e) {
                 e.printStackTrace();
                 showError("Error loading orders view: " + e.getMessage());
@@ -107,10 +125,29 @@ public class EmployeeMainController implements Initializable {
             Stage stage = (Stage) EmpContact.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
+
+            // Ensure proper sizing after loading
+            adjustStageSize(stage);
         }catch(IOException e){
             e.printStackTrace();
             showError("Error loading contact screen: " + e.getMessage());
         }
+    }
+
+    /**
+     * Adjust stage size to fit content
+     */
+    private void adjustStageSize(Stage stage) {
+        Platform.runLater(() -> {
+            Parent root = stage.getScene().getRoot();
+            double width = root.prefWidth(-1);
+            double height = root.prefHeight(-1);
+
+            // Add a bit of padding to prevent scrollbars
+            stage.setWidth(width + 20);
+            stage.setHeight(height + 20);
+            stage.centerOnScreen();
+        });
     }
 
     /**
