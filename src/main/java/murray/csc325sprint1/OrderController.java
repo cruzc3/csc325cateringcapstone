@@ -134,19 +134,43 @@ public class OrderController implements Initializable {
         // Add all to details container
         detailsContainer.getChildren().addAll(nameLabel, priceLabel, descLabel);
 
-        // Create image view (placeholder for now)
+        // Create image view with the item's image
         ImageView imageView = new ImageView();
-        try {
-            // Try to load an image for this item
-            Image image = new Image(getClass().getResourceAsStream("/images/food_placeholder.png"));
-            imageView.setImage(image);
-        } catch (Exception e) {
-            // Use a colored rectangle instead
-            imageView.setStyle("-fx-background-color: #CCCCCC;");
-        }
-        imageView.setFitHeight(80);
-        imageView.setFitWidth(120);
+        imageView.setFitHeight(100);
+        imageView.setFitWidth(150);
         imageView.setPreserveRatio(true);
+
+        // Default to a colored rectangle background
+        imageView.setStyle("-fx-background-color: #CCCCCC;");
+
+        // Get the image path and try to load it
+        try {
+            // First try to load the food placeholder image as a fallback
+            try {
+                Image placeholderImage = new Image(getClass().getResourceAsStream("/images/food_placeholder.png"));
+                if (placeholderImage != null && !placeholderImage.isError()) {
+                    imageView.setImage(placeholderImage);
+                }
+            } catch (Exception e) {
+                System.err.println("Could not load placeholder image: " + e.getMessage());
+            }
+
+            // Then try to load the specific item image if available
+            String imagePath = item.getImagePath();
+            if (imagePath != null && !imagePath.isEmpty()) {
+                try {
+                    Image itemImage = new Image(getClass().getResourceAsStream(imagePath));
+                    if (itemImage != null && !itemImage.isError()) {
+                        imageView.setImage(itemImage);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Could not load image for " + item.getName() + ": " + e.getMessage());
+                    // We'll keep using the placeholder image if it's already set
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error in image loading process: " + e.getMessage());
+        }
 
         // Create add button
         Button addButton = new Button("+");
@@ -282,5 +306,4 @@ public class OrderController implements Initializable {
             alert.showAndWait();
         }
     }
-
 }

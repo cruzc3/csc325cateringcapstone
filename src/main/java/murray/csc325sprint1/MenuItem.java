@@ -6,6 +6,7 @@ public class MenuItem {
     private String description;
     private String category;
     private String unit;
+    private String imagePath;
 
     /**
      * Constructor for MenuItem
@@ -15,13 +16,28 @@ public class MenuItem {
      * @param description Item description
      * @param category Item category (appetizer, entree, dessert)
      * @param unit Item unit (dozen, platter, order)
+     * @param imagePath Path to the item's image file
      */
-    public MenuItem(String name, double price, String description, String category, String unit) {
+    public MenuItem(String name, double price, String description, String category, String unit, String imagePath) {
         this.name = name;
         this.price = price;
         this.description = description;
         this.category = category;
         this.unit = unit;
+        this.imagePath = imagePath;
+    }
+
+    /**
+     * Constructor for MenuItem without image path (backward compatibility)
+     *
+     * @param name Item name
+     * @param price Item price
+     * @param description Item description
+     * @param category Item category (appetizer, entree, dessert)
+     * @param unit Item unit (dozen, platter, order)
+     */
+    public MenuItem(String name, double price, String description, String category, String unit) {
+        this(name, price, description, category, unit, "/images/food_placeholder.png");
     }
 
     /**
@@ -82,6 +98,14 @@ public class MenuItem {
 
     public void setUnit(String unit) {
         this.unit = unit;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
     @Override
