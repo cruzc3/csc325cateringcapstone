@@ -134,8 +134,11 @@ public class empContactController {
     @FXML
     private void handleEmpGoBackBtnClicked() {
         try {
-            Stage currentStage = (Stage) empGoBackBtn.getScene().getWindow();
-            currentStage.close();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/murray/csc325sprint1/emp-main.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) empGoBackBtn.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
         } catch (Exception e) {
             e.printStackTrace();
             showAlert("Error", "Failed to go back to the main screen.");
