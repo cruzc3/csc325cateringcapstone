@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -18,6 +19,10 @@ import murray.csc325sprint1.Model.UserFirestoreFunctions;
 import murray.csc325sprint1.Model.Util;
 
 import java.io.IOException;
+import java.util.Objects;
+
+import static murray.csc325sprint1.Model.ViewPaths.CUST_MAIN;
+import static murray.csc325sprint1.Model.ViewPaths.EMP_MAIN;
 
 
 public class LoginScreenController {
@@ -47,6 +52,7 @@ public class LoginScreenController {
 
     @FXML
     public void initialize() {
+        instanceOfUserFirestore = UserFirestoreFunctions.getInstance();
         passwordTF.textProperty().bindBidirectional(passwordPF.textProperty());
         Platform.runLater(() -> {
             Stage stage = (Stage) signInGridPane.getScene().getWindow();
@@ -59,7 +65,7 @@ public class LoginScreenController {
 
             stage.setWidth(prefWidth);
             stage.setHeight(prefHeight + 20);
-            stage.centerOnScreen();     // Center the stage
+            stage.centerOnScreen();
         });
     }
 
@@ -120,6 +126,24 @@ public class LoginScreenController {
             boolean isValid = instanceOfUserFirestore.verifyLogin(email, password);
             if (isValid) {
                 loginLbl.setText("Login successful!");
+
+                try {
+                    Parent nextPane;
+                    User u = instanceOfUserFirestore.getCurrentUser();
+                    u.toString();
+                    System.out.println(u.isEmployee());
+                    if (instanceOfUserFirestore.getCurrentUser().isEmployee()) {
+                        nextPane = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(EMP_MAIN)));
+                        System.out.println(UserFirestoreFunctions.getCurrentUser().isEmployee());
+                        System.out.println("User: " + UserFirestoreFunctions.getCurrentUser());
+                        System.out.print("Welcome valued employee");
+                    } else {
+                        nextPane = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(CUST_MAIN)));
+                    }
+                    instance.clearContent();
+                    instance.initScreenBorderPane.setCenter(nextPane);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
 
                 // Get the user from the database
                 User user = instanceOfUserFirestore.findUser(email);
