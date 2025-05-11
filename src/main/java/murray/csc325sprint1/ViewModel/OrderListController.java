@@ -1,9 +1,8 @@
 package murray.csc325sprint1.ViewModel;
 
-import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
+import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -14,14 +13,17 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import murray.csc325sprint1.FirestoreContext;
 import murray.csc325sprint1.MainApp;
 import murray.csc325sprint1.Model.OrderListItem;
+import murray.csc325sprint1.Model.User;
+import murray.csc325sprint1.Model.Util;
+import murray.csc325sprint1.Model.ViewPaths;
+import murray.csc325sprint1.Order;
 import murray.csc325sprint1.OrderService;
 import java.io.IOException;
 import java.net.URL;
@@ -33,28 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import javafx.scene.Parent;
-import java.net.URL;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 public class OrderListController implements Initializable {
 
@@ -77,6 +59,9 @@ public class OrderListController implements Initializable {
     private TableColumn<OrderListItem, String> statusColumn;
 
     @FXML
+    private TableColumn<OrderListItem, String> itemsColumn; // New column for order items
+
+    @FXML
     private TableColumn<OrderListItem, String> actionsColumn;
 
     @FXML
@@ -85,18 +70,31 @@ public class OrderListController implements Initializable {
     @FXML
     private Label noOrdersLabel;
 
+    @FXML
+    private Button backBtn;
+
+    @FXML
+    private Button refreshBtn;
+
     private OrderService orderService;
     private Firestore db;
     private ObservableList<OrderListItem> ordersList;
-
-    // This would be set from login screen. For now using a dummy email
-    private String userEmail = "customer@example.com";
+    private User currentUser;
+    private boolean isEmployeeView = false;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Get instances of services
         orderService = MainApp.getOrderService();
         db = FirestoreContext.getInstance().getFirestore();
+
+        // Get current user
+        currentUser = Util.getCurrentUser();
+
+        // Determine if this is employee view
+        if (currentUser != null) {
+            isEmployeeView = currentUser.isEmployee();
+        }
 
         // Initialize the table columns
         orderIdColumn.setCellValueFactory(new PropertyValueFactory<>("orderId"));
@@ -105,11 +103,140 @@ public class OrderListController implements Initializable {
         totalColumn.setCellValueFactory(new PropertyValueFactory<>("total"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
+        // Set up the items column with a custom cell factory
+        setupItemsColumn();
+
         // Setup the actions column
         setupActionsColumn();
 
         // Load orders on initialization
         loadOrders();
+
+        // Ensure proper window sizing after UI is fully loaded
+        Platform.runLater(() -> {
+            if (ordersTableView.getScene() != null && ordersTableView.getScene().getWindow() instanceof Stage) {
+                Stage stage = (Stage) ordersTableView.getScene().getWindow();
+
+                // Force layout pass to calculate proper size
+                ordersTableView.getScene().getRoot().applyCss();
+                ordersTableView.getScene().getRoot().layout();
+
+                double prefWidth = ordersTableView.getScene().getRoot().prefWidth(-1);
+                double prefHeight = ordersTableView.getScene().getRoot().prefHeight(-1);
+
+                // Add a bit of padding
+                stage.setWidth(prefWidth + 20);
+                stage.setHeight(prefHeight + 20);
+                stage.centerOnScreen();
+            }
+        });
+    }
+
+    /**
+     * Set up the items column to display order items with quantities
+     */
+    private void setupItemsColumn() {
+        itemsColumn.setCellValueFactory(cellData -> {
+            OrderListItem order = cellData.getValue();
+            Map<String, Integer> items = order.getOrderItems();
+
+            if (items == null || items.isEmpty()) {
+                return new SimpleStringProperty("No items");
+            }
+
+            // Create a nicely formatted string of items with quantities
+            String itemsList = items.entrySet().stream()
+                    .map(entry -> entry.getValue() + " × " + entry.getKey())
+                    .collect(Collectors.joining(", "));
+
+            return new SimpleStringProperty(itemsList);
+        });
+
+        // Add a button to show details in a popup for better viewing of long item lists
+        itemsColumn.setCellFactory(column -> {
+            return new TableCell<OrderListItem, String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+
+                    if (empty || item == null) {
+                        setText(null);
+                        setGraphic(null);
+                        return;
+                    }
+
+                    if (item.length() > 50) {
+                        // If text is long, display a truncated version with a "View" button
+                        HBox container = new HBox(5);
+
+                        Label itemsLabel = new Label(item.substring(0, 47) + "...");
+                        Button viewBtn = new Button("View");
+                        viewBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+
+                        viewBtn.setOnAction(event -> {
+                            OrderListItem orderItem = getTableView().getItems().get(getIndex());
+                            showItemsDetailsDialog(orderItem);
+                        });
+
+                        container.getChildren().addAll(itemsLabel, viewBtn);
+                        setGraphic(container);
+                        setText(null);
+                    } else {
+                        // If text is short enough, just display it
+                        setText(item);
+                        setGraphic(null);
+                    }
+                }
+            };
+        });
+    }
+
+    /**
+     * Show a dialog with detailed order items
+     */
+    private void showItemsDetailsDialog(OrderListItem order) {
+        try {
+            // Create dialog
+            Dialog<Void> dialog = new Dialog<>();
+            dialog.setTitle("Order Items");
+            dialog.setHeaderText("Items for Order #" + order.getOrderId());
+
+            // Create content
+            VBox content = new VBox(10);
+            content.setStyle("-fx-padding: 20;");
+
+            if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
+                // Create a list view to display items
+                ListView<String> itemsListView = new ListView<>();
+                ObservableList<String> items = FXCollections.observableArrayList();
+
+                for (Map.Entry<String, Integer> entry : order.getOrderItems().entrySet()) {
+                    items.add(entry.getValue() + " × " + entry.getKey());
+                }
+
+                itemsListView.setItems(items);
+                itemsListView.setPrefHeight(300);
+                itemsListView.setPrefWidth(400);
+
+                content.getChildren().add(itemsListView);
+            } else {
+                content.getChildren().add(new Label("No items in this order"));
+            }
+
+            // Add close button
+            ButtonType closeButton = new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE);
+            dialog.getDialogPane().getButtonTypes().add(closeButton);
+
+            // Set the content
+            dialog.getDialogPane().setContent(content);
+
+            // Show the dialog
+            dialog.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "Could not display order items: " + e.getMessage());
+        }
     }
 
     private void setupActionsColumn() {
@@ -118,18 +245,11 @@ public class OrderListController implements Initializable {
                     @Override
                     public TableCell<OrderListItem, String> call(final TableColumn<OrderListItem, String> param) {
                         return new TableCell<>() {
-                            private final Button editButton = new Button("Edit");
                             private final Button cancelButton = new Button("Cancel");
-                            private final HBox buttonsBox = new HBox(5, editButton, cancelButton);
+                            private final HBox buttonsBox = new HBox(5, cancelButton);
 
                             {
-                                editButton.setStyle("-fx-background-color: #4caf50; -fx-text-fill: white;");
                                 cancelButton.setStyle("-fx-background-color: #ff6347; -fx-text-fill: white;");
-
-                                editButton.setOnAction(event -> {
-                                    OrderListItem order = getTableView().getItems().get(getIndex());
-                                    openEditOrderDialog(order);
-                                });
 
                                 cancelButton.setOnAction(event -> {
                                     OrderListItem order = getTableView().getItems().get(getIndex());
@@ -150,7 +270,6 @@ public class OrderListController implements Initializable {
                                 boolean canModify = canModifyOrder(order);
 
                                 // Disable buttons if order cannot be modified
-                                editButton.setDisable(!canModify);
                                 cancelButton.setDisable(!canModify);
 
                                 setGraphic(buttonsBox);
@@ -167,29 +286,25 @@ public class OrderListController implements Initializable {
      */
     private void loadOrders() {
         try {
-            QuerySnapshot querySnapshot = db.collection("orders")
-                    //.whereEqualTo("userEmail", userEmail)
-                    .get()
-                    .get();
-
             List<OrderListItem> orders = new ArrayList<>();
 
-            for (QueryDocumentSnapshot document : querySnapshot.getDocuments()) {
-                String orderId = document.getString("orderId");
-                String pickupDate = document.getString("pickupDate");
-                String pickupTime = document.getString("pickupTime");
-                Double orderTotal = document.getDouble("orderTotal");
-                String status = document.getString("orderStatus");
+            if (isEmployeeView) {
+                // Employee view - get all orders
+                List<Order> allOrders = orderService.getAllOrders();
 
-                OrderListItem orderItem = new OrderListItem(
-                        orderId,
-                        pickupDate,
-                        pickupTime,
-                        String.format("$%.2f", orderTotal),
-                        status
-                );
+                for (Order order : allOrders) {
+                    OrderListItem orderItem = createOrderListItemFromOrder(order);
+                    orders.add(orderItem);
+                }
+            } else {
+                // Customer view - get only this user's orders
+                String userEmail = currentUser != null ? currentUser.getEmail() : "";
+                List<Order> userOrders = orderService.getUserOrders(userEmail);
 
-                orders.add(orderItem);
+                for (Order order : userOrders) {
+                    OrderListItem orderItem = createOrderListItemFromOrder(order);
+                    orders.add(orderItem);
+                }
             }
 
             // Update the table with orders
@@ -203,254 +318,29 @@ public class OrderListController implements Initializable {
             // Update status label
             orderStatusLabel.setText("Found " + orders.size() + " orders.");
 
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Error", "Failed to load orders: " + e.getMessage());
         }
     }
 
-
     /**
-     * Open the edit order dialog
+     * Create an OrderListItem from an Order with item details
      */
-    private void openEditOrderDialog(OrderListItem orderItem) {
-        try {
-            // Create a new OrderEditController
-            OrderEditController controller = new OrderEditController();
+    private OrderListItem createOrderListItemFromOrder(Order order) {
+        OrderListItem orderItem = new OrderListItem(
+                order.getOrderId(),
+                order.getPickupDate(),
+                order.getPickupTime(),
+                String.format("$%.2f", order.getOrderTotal()),
+                order.getOrderStatus()
+        );
 
-            // Create the dialog programmatically
-            Stage dialogStage = new Stage();
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.initStyle(StageStyle.DECORATED);
-            dialogStage.setTitle("Edit Order #" + orderItem.getOrderId());
+        // Set the order items map (new field in OrderListItem class)
+        orderItem.setOrderItems(order.getOrderItems());
 
-            // Create a root container
-            VBox root = new VBox(10);
-            root.setPadding(new Insets(20));
-            root.setStyle("-fx-background-color: white;");
-
-            // Create the header
-            Label titleLabel = new Label("Edit Order #" + orderItem.getOrderId());
-            titleLabel.setFont(Font.font("System", FontWeight.BOLD, 18));
-            root.getChildren().add(titleLabel);
-
-            // Order ID and Total
-            HBox infoBox = new HBox(20);
-            Label idLabel = new Label("Order ID: " + orderItem.getOrderId());
-            Label totalLabel = new Label("Total: " + orderItem.getTotal());
-            infoBox.getChildren().addAll(idLabel, totalLabel);
-            root.getChildren().add(infoBox);
-
-            // Separator
-            root.getChildren().add(new Separator());
-
-            // Order date and time section
-            Label dateTimeLabel = new Label("Change pickup date and time:");
-            dateTimeLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
-            root.getChildren().add(dateTimeLabel);
-
-            // Date and time selectors
-            HBox dateTimeBox = new HBox(20);
-
-            // Date picker
-            VBox dateBox = new VBox(5);
-            Label dateLabel = new Label("Date:");
-            DatePicker datePicker = new DatePicker();
-            dateBox.getChildren().addAll(dateLabel, datePicker);
-
-            // Time combo box
-            VBox timeBox = new VBox(5);
-            Label timeLabel = new Label("Time:");
-            ComboBox<String> timeComboBox = new ComboBox<>();
-
-            // Add times from 9 AM to 7 PM
-            ObservableList<String> times = FXCollections.observableArrayList();
-            LocalTime startTime = LocalTime.of(9, 0);
-            LocalTime endTime = LocalTime.of(19, 0);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a");
-
-            LocalTime current = startTime;
-            while (!current.isAfter(endTime)) {
-                times.add(current.format(formatter));
-                current = current.plusMinutes(30);
-            }
-
-            timeComboBox.setItems(times);
-            timeBox.getChildren().addAll(timeLabel, timeComboBox);
-
-            dateTimeBox.getChildren().addAll(dateBox, timeBox);
-            root.getChildren().add(dateTimeBox);
-
-            // Availability label
-            Label availabilityLabel = new Label("Select date and time to check availability");
-            availabilityLabel.setStyle("-fx-text-fill: blue;");
-            root.getChildren().add(availabilityLabel);
-
-            // Buttons
-            HBox buttonsBox = new HBox(20);
-            buttonsBox.setAlignment(Pos.CENTER);
-
-            Button cancelOrderButton = new Button("Cancel Order");
-            cancelOrderButton.setStyle("-fx-background-color: #ff6347; -fx-text-fill: white;");
-
-            Button saveButton = new Button("Save Changes");
-            saveButton.setStyle("-fx-background-color: #4caf50; -fx-text-fill: white;");
-
-            buttonsBox.getChildren().addAll(cancelOrderButton, saveButton);
-            root.getChildren().add(buttonsBox);
-
-            // Create the scene and set it on the stage
-            Scene scene = new Scene(root, 500, 400);
-            dialogStage.setScene(scene);
-
-            // Initialize the order data and setup event handlers
-            try {
-                // Assume we're working with a date in format yyyy-MM-dd
-                datePicker.setValue(LocalDate.parse(orderItem.getPickupDate()));
-                timeComboBox.setValue(orderItem.getPickupTime());
-
-                // Check availability when date or time changes
-                datePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
-                    updateAvailability(datePicker.getValue(), timeComboBox.getValue(), availabilityLabel, saveButton, orderItem.getOrderId());
-                });
-
-                timeComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
-                    updateAvailability(datePicker.getValue(), timeComboBox.getValue(), availabilityLabel, saveButton, orderItem.getOrderId());
-                });
-
-                // Save button action
-                saveButton.setOnAction(event -> {
-                    saveChanges(orderItem, datePicker.getValue().toString(), timeComboBox.getValue(), dialogStage);
-                });
-
-                // Cancel order button action
-                cancelOrderButton.setOnAction(event -> {
-                    cancelOrder(orderItem.getOrderId(), dialogStage);
-                });
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            // Show the dialog
-            dialogStage.showAndWait();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Error", "Failed to open edit dialog: " + e.getMessage());
-        }
+        return orderItem;
     }
-
-    /**
-     * Update the availability information
-     */
-    private void updateAvailability(LocalDate date, String time, Label availabilityLabel, Button saveButton, String orderId) {
-        if (date == null || time == null) {
-            return;
-        }
-
-        try {
-            OrderService orderService = new OrderService();
-
-            // Get current count for this time slot
-            int currentCount = orderService.countOrdersInTimeSlot(date.toString(), time);
-            int maxOrders = orderService.getMaxOrdersPerTimeSlot();
-            int remainingSlots = maxOrders - currentCount;
-
-            if (remainingSlots > 0) {
-                availabilityLabel.setText("Available slots: " + remainingSlots + " of " + maxOrders);
-                availabilityLabel.setStyle("-fx-text-fill: green;");
-                saveButton.setDisable(false);
-            } else {
-                availabilityLabel.setText("This time slot is fully booked. Please select another time.");
-                availabilityLabel.setStyle("-fx-text-fill: red;");
-                saveButton.setDisable(true);
-            }
-        } catch (Exception e) {
-            availabilityLabel.setText("Error checking availability");
-            availabilityLabel.setStyle("-fx-text-fill: red;");
-        }
-    }
-
-    /**
-     * Save changes to the order
-     */
-    private void saveChanges(OrderListItem orderItem, String newDate, String newTime, Stage dialogStage) {
-        try {
-            // Check if we can modify this order (24-hour rule)
-            if (!canModifyOrder(orderItem)) {
-                showAlert(Alert.AlertType.ERROR, "Cannot Modify Order",
-                        "Orders can only be modified if it's more than 24 hours before the scheduled pickup time.");
-                return;
-            }
-
-            // Update the order in Firestore
-            Firestore db = FirestoreContext.getInstance().getFirestore();
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("pickupDate", newDate);
-            updates.put("pickupTime", newTime);
-
-            db.collection("orders")
-                    .document(orderItem.getOrderId())
-                    .update(updates)
-                    .get();
-
-            showAlert(Alert.AlertType.INFORMATION, "Success", "Order updated successfully.");
-
-            // Refresh the orders list
-            refreshOrders();
-
-            // Close the dialog
-            dialogStage.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Error", "Failed to update order: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Cancel an order
-     */
-    private void cancelOrder(String orderId, Stage dialogStage) {
-        try {
-            // Check if we can cancel this order (24-hour rule)
-            OrderListItem orderItem = findOrderById(orderId);
-            if (orderItem != null && !canModifyOrder(orderItem)) {
-                showAlert(Alert.AlertType.ERROR, "Cannot Cancel Order",
-                        "Orders can only be cancelled if it's more than 24 hours before the scheduled pickup time.");
-                return;
-            }
-
-            // Confirm cancellation
-            Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmation.setTitle("Cancel Order");
-            confirmation.setHeaderText("Cancel Order #" + orderId);
-            confirmation.setContentText("Are you sure you want to cancel this order? This action cannot be undone.");
-
-            if (confirmation.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
-                // Update order status to Cancelled
-                Firestore db = FirestoreContext.getInstance().getFirestore();
-                db.collection("orders")
-                        .document(orderId)
-                        .update("orderStatus", "Cancelled")
-                        .get();
-
-                showAlert(Alert.AlertType.INFORMATION, "Success", "Order cancelled successfully.");
-
-                // Refresh the orders list
-                refreshOrders();
-
-                // Close the dialog
-                dialogStage.close();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Error", "Failed to cancel order: " + e.getMessage());
-        }
-    }
-
 
     /**
      * Confirm and cancel an order
@@ -471,17 +361,13 @@ public class OrderListController implements Initializable {
      */
     private void cancelOrderInFirestore(String orderId) {
         try {
-            db.collection("orders")
-                    .document(orderId)
-                    .update("orderStatus", "Cancelled")
-                    .get();
-
-            showAlert(Alert.AlertType.INFORMATION, "Success", "Order cancelled successfully.");
-
-            // Refresh the orders list
-            loadOrders();
-
-        } catch (InterruptedException | ExecutionException e) {
+            if (orderService.cancelOrder(orderId)) {
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Order cancelled successfully.");
+                refreshOrders();
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed to cancel order.");
+            }
+        } catch (Exception e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Error", "Failed to cancel order: " + e.getMessage());
         }
@@ -496,20 +382,40 @@ public class OrderListController implements Initializable {
     }
 
     /**
-     * Go to the home screen
+     * Go back to the home/main menu
      */
     @FXML
     private void goToHome(ActionEvent event) {
         try {
-            // Navigate to customer menu
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/murray/csc325sprint1/customer-main.fxml"));
-            Scene scene = new Scene(loader.load());
-            Stage stage = (Stage) ordersTableView.getScene().getWindow();
+            // Navigate to appropriate menu based on user type
+            String fxmlPath = isEmployeeView ? ViewPaths.EMPLOYEE_MAIN_SCREEN : ViewPaths.CUSTOMER_MAIN_SCREEN;
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+
+            // Get the stage from the back button
+            Stage stage = (Stage) backBtn.getScene().getWindow();
             stage.setScene(scene);
+
+            // Ensure proper sizing after loading
+            Platform.runLater(() -> {
+                root.applyCss();
+                root.layout();
+                double prefWidth = root.prefWidth(-1);
+                double prefHeight = root.prefHeight(-1);
+
+                // Add a bit of padding
+                stage.setWidth(prefWidth + 20);
+                stage.setHeight(prefHeight + 20);
+                stage.centerOnScreen();
+            });
+
+            stage.show();
 
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Error", "Failed to navigate to home: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to navigate back to main menu: " + e.getMessage());
         }
     }
 
@@ -520,10 +426,26 @@ public class OrderListController implements Initializable {
     private void createNewOrder(ActionEvent event) {
         try {
             // Navigate to the order view
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/murray/csc325sprint1/OrderView.fxml"));
-            Scene scene = new Scene(loader.load());
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(ViewPaths.ORDER_VIEW_SCREEN));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
             Stage stage = (Stage) ordersTableView.getScene().getWindow();
             stage.setScene(scene);
+
+            // Ensure proper sizing after loading
+            Platform.runLater(() -> {
+                root.applyCss();
+                root.layout();
+                double prefWidth = root.prefWidth(-1);
+                double prefHeight = root.prefHeight(-1);
+
+                // Add a bit of padding
+                stage.setWidth(prefWidth + 20);
+                stage.setHeight(prefHeight + 20);
+                stage.centerOnScreen();
+            });
+
+            stage.show();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -588,5 +510,4 @@ public class OrderListController implements Initializable {
 
         return null;
     }
-
 }

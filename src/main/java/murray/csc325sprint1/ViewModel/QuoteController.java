@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -55,6 +56,25 @@ public class QuoteController implements Initializable {
         if (homeBtn != null) {
             homeBtn.setOnAction(event -> navigateToCustomerMenu(event));
         }
+
+        // Ensure proper window sizing after UI is fully loaded
+        Platform.runLater(() -> {
+            if (menuContainer.getScene() != null && menuContainer.getScene().getWindow() instanceof Stage) {
+                Stage stage = (Stage) menuContainer.getScene().getWindow();
+
+                // Force layout pass to calculate proper size
+                menuContainer.getScene().getRoot().applyCss();
+                menuContainer.getScene().getRoot().layout();
+
+                double prefWidth = menuContainer.getScene().getRoot().prefWidth(-1);
+                double prefHeight = menuContainer.getScene().getRoot().prefHeight(-1);
+
+                // Add a bit of padding
+                stage.setWidth(prefWidth + 20);
+                stage.setHeight(prefHeight + 20);
+                stage.centerOnScreen();
+            }
+        });
     }
 
     /**
@@ -67,6 +87,20 @@ public class QuoteController implements Initializable {
             Stage stage = (Stage) homeBtn.getScene().getWindow();
             Scene scene = new Scene(root);
             stage.setScene(scene);
+
+            // Ensure proper sizing for customer menu screen
+            Platform.runLater(() -> {
+                root.applyCss();
+                root.layout();
+                double prefWidth = root.prefWidth(-1);
+                double prefHeight = root.prefHeight(-1);
+
+                // Add a bit of padding
+                stage.setWidth(prefWidth + 20);
+                stage.setHeight(prefHeight + 20);
+                stage.centerOnScreen();
+            });
+
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -149,19 +183,43 @@ public class QuoteController implements Initializable {
         // Add all to details container
         detailsContainer.getChildren().addAll(nameLabel, priceLabel, descLabel);
 
-        // Create image view (placeholder for now)
+        // Create image view with the item's image
         ImageView imageView = new ImageView();
-        try {
-            // Try to load an image for this item
-            Image image = new Image(getClass().getResourceAsStream("/images/food_placeholder.png"));
-            imageView.setImage(image);
-        } catch (Exception e) {
-            // Use a colored rectangle instead
-            imageView.setStyle("-fx-background-color: #CCCCCC;");
-        }
-        imageView.setFitHeight(80);
-        imageView.setFitWidth(120);
+        imageView.setFitHeight(100);
+        imageView.setFitWidth(150);
         imageView.setPreserveRatio(true);
+
+        // Default to a colored rectangle background
+        imageView.setStyle("-fx-background-color: #CCCCCC;");
+
+        // Get the image path and try to load it
+        try {
+            // First try to load the food placeholder image as a fallback
+            try {
+                Image placeholderImage = new Image(getClass().getResourceAsStream("/images/food_placeholder.png"));
+                if (placeholderImage != null && !placeholderImage.isError()) {
+                    imageView.setImage(placeholderImage);
+                }
+            } catch (Exception e) {
+                System.err.println("Could not load placeholder image: " + e.getMessage());
+            }
+
+            // Then try to load the specific item image if available
+            String imagePath = item.getImagePath();
+            if (imagePath != null && !imagePath.isEmpty()) {
+                try {
+                    Image itemImage = new Image(getClass().getResourceAsStream(imagePath));
+                    if (itemImage != null && !itemImage.isError()) {
+                        imageView.setImage(itemImage);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Could not load image for " + item.getName() + ": " + e.getMessage());
+                    // We'll keep using the placeholder image if it's already set
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error in image loading process: " + e.getMessage());
+        }
 
         // Create add button
         Button addButton = new Button("+");
@@ -241,7 +299,22 @@ public class QuoteController implements Initializable {
             Stage dialogStage = new Stage();
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.initStyle(StageStyle.UNDECORATED);
-            dialogStage.setScene(new Scene(root));
+            Scene scene = new Scene(root);
+            dialogStage.setScene(scene);
+
+            // Ensure proper sizing for dialog
+            Platform.runLater(() -> {
+                root.applyCss();
+                root.layout();
+                double prefWidth = root.prefWidth(-1);
+                double prefHeight = root.prefHeight(-1);
+
+                // Add a bit of padding
+                dialogStage.setWidth(prefWidth + 20);
+                dialogStage.setHeight(prefHeight + 20);
+                dialogStage.centerOnScreen();
+            });
+
             dialogStage.showAndWait();
 
         } catch (IOException e) {

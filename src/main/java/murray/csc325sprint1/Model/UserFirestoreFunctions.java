@@ -127,8 +127,9 @@ public class UserFirestoreFunctions {
 
     public User findUser(String email) {
         try {
-            DocumentSnapshot snapshot = db.collection(USER_COLLECTION).document(email).get().get();
+            DocumentSnapshot snapshot = db.collection(USER_COLLECTION).document(email.toLowerCase()).get().get();
             if (snapshot.exists()) {
+
                 String firstName = snapshot.getString("first name");
                 String lastName = snapshot.getString("last name");
                 String userEmail = snapshot.getString("email");
@@ -144,7 +145,24 @@ public class UserFirestoreFunctions {
                         secQuestion,
                         secAnswer,
                         Boolean.TRUE.equals(isEmployee)
+
+                User user = new User(
+                        snapshot.getString("first name"),
+                        snapshot.getString("last name"),
+                        email, // Use the provided email to ensure case consistency
+                        snapshot.getString("security question"),
+                        snapshot.getString("security answer"),
+                        snapshot.getString("password")
+
                 );
+
+                // Set employee status
+                Boolean isEmployee = snapshot.getBoolean("is employee");
+                if (isEmployee != null) {
+                    user.setEmployee(isEmployee);
+                }
+
+                return user;
             }
         } catch (Exception e) {
             System.err.println("Error finding user: " + e.getMessage());
@@ -187,6 +205,7 @@ public class UserFirestoreFunctions {
         return false;
     }
 
+
     public List<User> getAllEmployees() {
         List<User> employeeList = new LinkedList<>();
         try {
@@ -217,3 +236,6 @@ public class UserFirestoreFunctions {
         return employeeList;
     }
 }
+
+}
+

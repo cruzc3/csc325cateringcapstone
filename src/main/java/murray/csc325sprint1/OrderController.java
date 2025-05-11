@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -57,6 +58,16 @@ public class OrderController implements Initializable {
             homeBtn.setOnAction(event -> handleHomeButtonClick());
         }
 
+        // Ensure proper window resizing after scene is fully loaded
+        Platform.runLater(() -> {
+            Stage stage = (Stage) menuContainer.getScene().getWindow();
+            double width = stage.getScene().getRoot().prefWidth(-1);
+            double height = stage.getScene().getRoot().prefHeight(-1);
+
+            stage.setWidth(width);
+            stage.setHeight(height);
+            stage.centerOnScreen();
+        });
     }
 
     /**
@@ -134,19 +145,43 @@ public class OrderController implements Initializable {
         // Add all to details container
         detailsContainer.getChildren().addAll(nameLabel, priceLabel, descLabel);
 
-        // Create image view (placeholder for now)
+        // Create image view with the item's image
         ImageView imageView = new ImageView();
-        try {
-            // Try to load an image for this item
-            Image image = new Image(getClass().getResourceAsStream("/images/food_placeholder.png"));
-            imageView.setImage(image);
-        } catch (Exception e) {
-            // Use a colored rectangle instead
-            imageView.setStyle("-fx-background-color: #CCCCCC;");
-        }
-        imageView.setFitHeight(80);
-        imageView.setFitWidth(120);
+        imageView.setFitHeight(100);
+        imageView.setFitWidth(150);
         imageView.setPreserveRatio(true);
+
+        // Default to a colored rectangle background
+        imageView.setStyle("-fx-background-color: #CCCCCC;");
+
+        // Get the image path and try to load it
+        try {
+            // First try to load the food placeholder image as a fallback
+            try {
+                Image placeholderImage = new Image(getClass().getResourceAsStream("/images/food_placeholder.png"));
+                if (placeholderImage != null && !placeholderImage.isError()) {
+                    imageView.setImage(placeholderImage);
+                }
+            } catch (Exception e) {
+                System.err.println("Could not load placeholder image: " + e.getMessage());
+            }
+
+            // Then try to load the specific item image if available
+            String imagePath = item.getImagePath();
+            if (imagePath != null && !imagePath.isEmpty()) {
+                try {
+                    Image itemImage = new Image(getClass().getResourceAsStream(imagePath));
+                    if (itemImage != null && !itemImage.isError()) {
+                        imageView.setImage(itemImage);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Could not load image for " + item.getName() + ": " + e.getMessage());
+                    // We'll keep using the placeholder image if it's already set
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error in image loading process: " + e.getMessage());
+        }
 
         // Create add button
         Button addButton = new Button("+");
@@ -219,7 +254,19 @@ public class OrderController implements Initializable {
             Stage dialogStage = new Stage();
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.initStyle(StageStyle.UNDECORATED);
-            dialogStage.setScene(new Scene(root));
+
+            Scene scene = new Scene(root);
+            dialogStage.setScene(scene);
+
+            // Adjust the dialog stage size to properly fit content
+            root.applyCss();
+            root.layout();
+            double dialogWidth = root.prefWidth(-1) + 20;
+            double dialogHeight = root.prefHeight(-1) + 20;
+            dialogStage.setWidth(dialogWidth);
+            dialogStage.setHeight(dialogHeight);
+            dialogStage.centerOnScreen();
+
             dialogStage.showAndWait();
 
             // Check if order was placed successfully
@@ -272,6 +319,19 @@ public class OrderController implements Initializable {
             Scene scene = new Scene(root);
             Stage stage = (Stage) cartBtn.getScene().getWindow();
             stage.setScene(scene);
+
+            // Ensure proper sizing after loading
+            Platform.runLater(() -> {
+                root.applyCss();
+                root.layout();
+                double width = root.prefWidth(-1) + 20;
+                double height = root.prefHeight(-1) + 20;
+
+                stage.setWidth(width);
+                stage.setHeight(height);
+                stage.centerOnScreen();
+            });
+
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -282,5 +342,4 @@ public class OrderController implements Initializable {
             alert.showAndWait();
         }
     }
-
 }
