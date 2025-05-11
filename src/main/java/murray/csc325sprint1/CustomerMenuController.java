@@ -111,23 +111,19 @@ public class CustomerMenuController implements Initializable {
         // Initialize log out functionality - simply close the application
         cusLogOut.setOnAction(event -> {
             try {
-                // Clear current user session
-                Util.setCurrentUser(null);
-
-                // Get the current stage
-                Stage currentStage = (Stage) cusLogOut.getScene().getWindow();
-
-                // Show confirmation dialog
                 Alert confirmExit = new Alert(Alert.AlertType.CONFIRMATION);
-                confirmExit.setTitle("Log Out");
-                confirmExit.setHeaderText("Log Out");
-                confirmExit.setContentText("Are you sure you want to log out and exit the application?");
-
+                confirmExit.setContentText("Are you sure you want to log out?");
+                confirmExit.setHeaderText(null);
+                confirmExit.setTitle(null);
                 if (confirmExit.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
-                    // Close the application
-                    currentStage.close();
-                    // Optionally force exit the application
-                    // Platform.exit();
+                    Util.setCurrentUser(null);
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource(ViewPaths.INIT_SCREEN));
+                    Parent root = loader.load();
+                    Stage stage = (Stage) cusLogOut.getScene().getWindow();
+                    Scene scene = new Scene(root);
+                    stage.setScene(scene);
+                    stage.show();
+                    adjustStageSize(stage);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
