@@ -61,6 +61,13 @@
          <padding>
             <Insets left="20.0" />
          </padding>
+         <children>
+            <ImageView fitHeight="99.0" fitWidth="178.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../images/JackCateringLogo.png" />
+               </image>
+            </ImageView>
+         </children>
       </VBox>
       <Button fx:id="adminBtn" disable="true" layoutX="211.0" layoutY="440.0" mnemonicParsing="false" onAction="#adminBtnClicked" prefHeight="55.0" prefWidth="139.0" style="-fx-background-color: #ffffff; -fx-border-color: #000000;" text="Admin" textFill="#8a8a8a" visible="false">
          <font>

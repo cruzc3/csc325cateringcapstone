@@ -70,7 +70,7 @@ public class TermsAndConditionsController {
         prefHeight = tCBP.prefHeight(-1);
         stage.setWidth(instance.initScreenBorderPane.getPrefWidth() + prefWidth);
         stage.setHeight(prefHeight + 30);
-        stage.centerOnScreen(); // Optional
+        stage.centerOnScreen();
                 stageIsSet(stage);
             }
         });

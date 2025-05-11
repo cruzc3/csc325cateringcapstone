@@ -71,12 +71,12 @@ public class EmployeeMainController implements Initializable {
 
         // Ensure proper window resizing after scene is fully loaded
         Platform.runLater(() -> {
-            Stage stage = (Stage) EmpContact.getScene().getWindow();
+            Stage stage = (Stage) catering.getScene().getWindow();
             double width = stage.getScene().getRoot().prefWidth(-1);
             double height = stage.getScene().getRoot().prefHeight(-1);
 
-            stage.setWidth(width);
-            stage.setHeight(height);
+            stage.setWidth(778);
+            stage.setHeight(575);
             stage.centerOnScreen();
         });
 
