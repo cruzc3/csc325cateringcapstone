@@ -26,7 +26,6 @@ public class TestInitApp extends Application {
         }
 
     public static void main(String[] args) {
-
         //Account creation test
         User admin = new User("admin","admin", "admin@farmingdale.edu");
         User customer = new User("customer","customer", "customer@farmingdale.edu","customer","customer", "customer");

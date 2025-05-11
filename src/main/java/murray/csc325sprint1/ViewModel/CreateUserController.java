@@ -76,7 +76,7 @@ public class CreateUserController {
 
             stage.setWidth(prefWidth);
             stage.setHeight(prefHeight);
-            stage.centerOnScreen(); // Optional: keep UI centered
+            Platform.runLater(stage::centerOnScreen);
         });
     }
 

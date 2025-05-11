@@ -89,7 +89,7 @@ public class ResetScreenController {
 
                 stage.setWidth(prefWidth);
                 stage.setHeight(prefHeight + 40);
-                stage.centerOnScreen();
+                Platform.runLater(stage::centerOnScreen);
             });
 
         } catch (IOException e) {

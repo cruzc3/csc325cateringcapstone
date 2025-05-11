@@ -60,9 +60,9 @@ public class CustomerMenuController implements Initializable {
             double width = stage.getScene().getRoot().prefWidth(-1);
             double height = stage.getScene().getRoot().prefHeight(-1);
 
-            stage.setWidth(width);
-            stage.setHeight(height);
-            stage.centerOnScreen();
+            stage.setWidth(778);
+            stage.setHeight(575);
+            Platform.runLater(stage::centerOnScreen);
         });
 
         // Initialize the Quote button click event

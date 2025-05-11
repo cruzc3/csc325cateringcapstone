@@ -43,19 +43,6 @@ public class InitScreenController {
     private final List<Image> images = new ArrayList<>();
     private int currentIndex = 0;
 
-//    @FXML
-//    public void initialize() {
-//        try {
-//            // Load the default pane from the FXML resource
-//            GridPane defaultPane = FXMLLoader.load(getClass().getResource("csc325socialmediaapp/inital-screen.fxml"));
-//            // Set the loaded pane into the center of the BorderPane
-//            initScreenBorderPane.setCenter(defaultPane);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        loadImagesFromFolder();
-//        startImageSlideshow();
-//    }
 
     private void loadImagesFromFolder() {
         try {
