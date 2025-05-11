@@ -81,7 +81,7 @@ public class AdminPageController {
             showAlert("No Employees Found", "No employees were found in the system.");
         } else {
             displayUsers(employees, usersVBox);
-            showAlert("Employees Found", employees.size() + " employees were found.");
+//            showAlert("Employees Found", employees.size() + " employees were found.");
         }
     }
 
