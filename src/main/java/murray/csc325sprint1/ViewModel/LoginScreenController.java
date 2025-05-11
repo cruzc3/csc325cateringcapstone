@@ -126,16 +126,16 @@ public class LoginScreenController {
             boolean isValid = instanceOfUserFirestore.verifyLogin(email, password);
             if (isValid) {
                 loginLbl.setText("Login successful!");
-
                 try {
                     Parent nextPane;
-                    User u = instanceOfUserFirestore.getCurrentUser();
-                    u.toString();
-                    System.out.println(u.isEmployee());
-                    if (instanceOfUserFirestore.getCurrentUser().isEmployee()) {
+                    User currentUser = instanceOfUserFirestore.getCurrentUser();
+                    currentUser.toString();
+                    System.out.println(currentUser.isEmployee());
+
+                    // Check if user is an employee
+                    if (currentUser.isEmployee()) {
                         nextPane = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(EMP_MAIN)));
-                        System.out.println(UserFirestoreFunctions.getCurrentUser().isEmployee());
-                        System.out.println("User: " + UserFirestoreFunctions.getCurrentUser());
+                        System.out.println("User: " + currentUser);
                         System.out.print("Welcome valued employee");
                     } else {
                         nextPane = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(CUST_MAIN)));
@@ -143,26 +143,15 @@ public class LoginScreenController {
                     instance.clearContent();
                     instance.initScreenBorderPane.setCenter(nextPane);
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
-
-                // Get the user from the database
-                User user = instanceOfUserFirestore.findUser(email);
-                if (user != null) {
-                    // Store the current user for later reference
-                    Util.setCurrentUser(user);
-
-                    // Get the current stage
-                    Stage stage = (Stage) signInGridPane.getScene().getWindow();
-
-                    // Navigate to the appropriate menu based on user type
-                    Util.navigateToAppropriateMenu(stage, user);
-                } else {
-                    loginLbl.setText("User not found. Please try again.");
+                    // Handle loading pane failure
+                    e.printStackTrace();
+                    loginLbl.setText("Error loading user menu: " + e.getMessage());
                 }
             } else {
                 loginLbl.setText("Invalid email or password.");
             }
         } catch (Exception e) {
+            // Handle general exceptions
             e.printStackTrace();
             loginLbl.setText("Error during login: " + e.getMessage());
         }

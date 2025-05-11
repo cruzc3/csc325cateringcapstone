@@ -14,8 +14,8 @@ public class TestInitApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
             try {
-//                FXMLLoader fxmlLoader = new FXMLLoader(MainApp.class.getResource(INIT_SCREEN));
-                FXMLLoader fxmlLoader = new FXMLLoader(MainApp.class.getResource(ADMIN_MAIN));
+                FXMLLoader fxmlLoader = new FXMLLoader(MainApp.class.getResource(INIT_SCREEN));
+//                FXMLLoader fxmlLoader = new FXMLLoader(MainApp.class.getResource(ADMIN_MAIN));
                 Scene scene = new Scene(fxmlLoader.load());
                 stage.setTitle("Jack's Catering Service");
                 stage.setScene(scene);

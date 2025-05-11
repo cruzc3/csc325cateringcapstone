@@ -16,7 +16,6 @@ public class User {
         this.password = password;
         this.employee = false;
         this.admin = false;
-        this.employee = false; // Default to customer
     }
 
     /**
@@ -60,6 +59,16 @@ public class User {
         this.password ="admin";
         this.employee = true;
         this.admin = true;
+    }
+
+    public User(String fName, String lName, String email, String secQuestion, String secAnswer,Boolean employeeStatus, Boolean adminStatus) {
+        this.fName = fName;
+        this.lName = lName;
+        this.email = email;
+        this.secQuestion = secQuestion;
+        this.secAnswer = secAnswer;
+        this.employee = employeeStatus;
+        this.admin = adminStatus;
     }
 
 
@@ -120,11 +129,11 @@ public class User {
     }
 
     public boolean isAdmin() {
-        return employee;
+        return admin;
     }
 
-    public void setAdmin(boolean employee) {
-        this.employee = employee;
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 
     @Override

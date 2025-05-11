@@ -138,26 +138,19 @@ public class UserFirestoreFunctions {
                 Boolean isEmployee = snapshot.getBoolean("is employee");
                 Boolean isAdmin = snapshot.getBoolean("is admin");
 
-                return new User(
+                isAdmin = Boolean.TRUE.equals(isAdmin);
+
+                User user = new User(
                         firstName,
                         lastName,
                         userEmail,
                         secQuestion,
                         secAnswer,
-                        Boolean.TRUE.equals(isEmployee)
-
-                User user = new User(
-                        snapshot.getString("first name"),
-                        snapshot.getString("last name"),
-                        email, // Use the provided email to ensure case consistency
-                        snapshot.getString("security question"),
-                        snapshot.getString("security answer"),
-                        snapshot.getString("password")
-
+                        Boolean.TRUE.equals(isEmployee),
+                        isAdmin // Make sure isAdmin is assigned here
                 );
 
-                // Set employee status
-                Boolean isEmployee = snapshot.getBoolean("is employee");
+                // Set employee status if applicable
                 if (isEmployee != null) {
                     user.setEmployee(isEmployee);
                 }
@@ -236,6 +229,3 @@ public class UserFirestoreFunctions {
         return employeeList;
     }
 }
-
-}
-

@@ -1,6 +1,7 @@
 package murray.csc325sprint1;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -8,19 +9,27 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import murray.csc325sprint1.Model.User;
+import murray.csc325sprint1.Model.UserFirestoreFunctions;
 import murray.csc325sprint1.Model.Util;
 import murray.csc325sprint1.Model.ViewPaths;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import murray.csc325sprint1.ViewModel.InitScreenController;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import static murray.csc325sprint1.Model.ViewPaths.ADMIN_MAIN;
+
 
 public class EmployeeMainController implements Initializable {
-
+    private static InitScreenController instance = InitScreenController.getInstance();
+    private static UserFirestoreFunctions instanceOfUserFirestore = UserFirestoreFunctions.getInstance();
     @FXML
     private Button EmpContact;
 
@@ -41,11 +50,20 @@ public class EmployeeMainController implements Initializable {
 
     private User currentUser;
 
+    @FXML
+    private Button adminBtn;
+
+    @FXML
+    private AnchorPane catering;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Get the current user from Util
-        currentUser = Util.getCurrentUser();
+        currentUser = instanceOfUserFirestore.getCurrentUser();
 
+        if (currentUser.isAdmin()) {
+            adminBtn.setDisable(false);
+            adminBtn.setVisible(true);
+        }
         // Update welcome message if we have a welcome label and a user
         if (welcomeLabel != null && currentUser != null) {
             welcomeLabel.setText("Welcome, " + currentUser.getfName() + "!");
@@ -123,7 +141,7 @@ public class EmployeeMainController implements Initializable {
     }
 
     private void ContactBtnClicked() {
-        try{
+        try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(ViewPaths.EMPLOYEE_CONTACT_SCREEN));
             Parent root = fxmlLoader.load();
 
@@ -134,7 +152,7 @@ public class EmployeeMainController implements Initializable {
 
             // Ensure proper sizing after loading
             adjustStageSize(stage);
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             showError("Error loading contact screen: " + e.getMessage());
         }
@@ -177,4 +195,22 @@ public class EmployeeMainController implements Initializable {
         alert.setContentText("This feature is not yet implemented in the current version.");
         alert.showAndWait();
     }
+
+    @FXML
+    void adminBtnClicked(ActionEvent event) {
+        try {
+            Stage popupStage = new Stage();
+            popupStage.setTitle("Admin Privileges");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(ADMIN_MAIN));
+            AnchorPane adminPane = loader.load();
+            Scene popupScene = new Scene(adminPane);
+            popupStage.setScene(popupScene);
+            popupStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Handle loading errors
+            System.err.println("Error loading AdminPane.fxml: " + e.getMessage());
+        }
+    }
+
 }

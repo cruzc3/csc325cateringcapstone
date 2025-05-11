@@ -3,6 +3,7 @@ package murray.csc325sprint1.ViewModel;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
@@ -10,6 +11,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import murray.csc325sprint1.Model.User;
 import murray.csc325sprint1.Model.UserFirestoreFunctions;
 
@@ -21,7 +23,7 @@ import static murray.csc325sprint1.Model.ViewPaths.EMP_MAIN;
 import static murray.csc325sprint1.Model.ViewPaths.PROFILE_MAIN;
 
 public class AdminPageController {
-    private static InitScreenController instance = InitScreenController.getInstance();
+
     private static UserFirestoreFunctions instanceOfUserFirestore = UserFirestoreFunctions.getInstance();
     @FXML
     private AnchorPane adminPane;
@@ -42,11 +44,9 @@ public class AdminPageController {
 
     @FXML
     void backBtnClicked(ActionEvent event) throws IOException {
-        Parent nextPane;
-        nextPane = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(EMP_MAIN)));
-        System.out.println(UserFirestoreFunctions.getCurrentUser().isEmployee());
-        instance.clearContent();
-        instance.initScreenBorderPane.setCenter(nextPane);
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.close();
+        showAlert("Window Closed", "The window has been closed.");
     }
 
     @FXML
@@ -54,6 +54,7 @@ public class AdminPageController {
         if (selectedUser != null) {
             instanceOfUserFirestore.deleteUser(selectedUser);
             usersVBox.getChildren().remove(selectedCard);
+            showAlert("User Deleted",  selectedUser.getEmail() + " has been successfully deleted." );
             selectedUser = null;
             selectedCard = null;
         } else {
@@ -64,8 +65,8 @@ public class AdminPageController {
     @FXML
     void demoteUserBtnClicked(ActionEvent event) {
         if (selectedUser != null) {
-            User currentAdmin = instanceOfUserFirestore.getCurrentUser();
             instanceOfUserFirestore.demoteToCustomer(selectedUser);
+            showAlert("User Demoted",  selectedUser.getEmail() + " has been successfully demoted." );
         } else {
             showAlert("No User Selected", "Please select a user to demote.");
         }
@@ -76,6 +77,12 @@ public class AdminPageController {
         usersVBox.getChildren().clear();
         List<User> employees = UserFirestoreFunctions.getInstance().getAllEmployees();
         displayUsers(employees, usersVBox);
+        if (employees.isEmpty()) {
+            showAlert("No Employees Found", "No employees were found in the system.");
+        } else {
+            displayUsers(employees, usersVBox);
+            showAlert("Employees Found", employees.size() + " employees were found.");
+        }
     }
 
     @FXML
@@ -98,6 +105,7 @@ public class AdminPageController {
     void promoteUserBtnClicked(ActionEvent event) {
         if (selectedUser != null) {
             instanceOfUserFirestore.promoteToEmployee(selectedUser);
+            showAlert("User promoted",  selectedUser.getEmail() + " has been successfully promoted." );
         } else {
             showAlert("No User Selected", "Please select a user to promote.");
         }
