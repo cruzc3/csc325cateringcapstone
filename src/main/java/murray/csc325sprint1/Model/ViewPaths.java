@@ -19,4 +19,9 @@ public class ViewPaths {
     //-----------------------Boolean expression what directs users to corresponding panes----------\\
     public static final String EMP_MAIN = "/murray/csc325sprint1/emp-main.fxml";
     public static final String CUST_MAIN = "/murray/csc325sprint1/customer-main.fxml";
+
+    //--------------------------------Admin controls and profileView---------------------------\\
+    public static final String ADMIN_MAIN = "/murray/csc325sprint1/admin-page.fxml";
+    public static final String PROFILE_MAIN = "/murray/csc325sprint1/profile-card.fxml";
+
 }

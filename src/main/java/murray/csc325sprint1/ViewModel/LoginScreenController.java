@@ -64,7 +64,7 @@ public class LoginScreenController {
 
             stage.setWidth(prefWidth);
             stage.setHeight(prefHeight + 20);
-            stage.centerOnScreen();     // Center the stage
+            stage.centerOnScreen();
         });
     }
 
