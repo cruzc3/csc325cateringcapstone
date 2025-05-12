@@ -17,4 +17,5 @@ module murray.csc325sprint1 {
     exports murray.csc325sprint1;
     exports murray.csc325sprint1.Model;
     opens murray.csc325sprint1.ViewModel to javafx.fxml;
+    exports murray.csc325sprint1.ViewModel;
 }

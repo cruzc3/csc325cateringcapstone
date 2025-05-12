@@ -1,4 +1,4 @@
-package murray.csc325sprint1;
+package murray.csc325sprint1.ViewModel;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -10,7 +10,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import murray.csc325sprint1.Model.User;
 import murray.csc325sprint1.Model.UserFirestoreFunctions;
@@ -18,7 +17,6 @@ import murray.csc325sprint1.Model.Util;
 import murray.csc325sprint1.Model.ViewPaths;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import murray.csc325sprint1.ViewModel.InitScreenController;
 
 import java.io.IOException;
 import java.net.URL;
@@ -92,13 +90,7 @@ public class EmployeeMainController implements Initializable {
                 confirmExit.setTitle(null);
                 if (confirmExit.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
                     Util.setCurrentUser(null);
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource(ViewPaths.INIT_SCREEN));
-                    Parent root = loader.load();
-                    Stage stage = (Stage) EmpLogOut.getScene().getWindow();
-                    Scene scene = new Scene(root);
-                    stage.setScene(scene);
-                    stage.show();
-                    adjustStageSize(stage);
+                    Platform.exit();
                 }
             } catch (Exception e) {
                 e.printStackTrace();

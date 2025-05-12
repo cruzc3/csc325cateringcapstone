@@ -4,7 +4,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import murray.csc325sprint1.CustomerMenuController;
+import murray.csc325sprint1.ViewModel.CustomerMenuController;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="537.0" prefWidth="778.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="murray.csc325sprint1.CustomerMenuController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="537.0" prefWidth="778.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="murray.csc325sprint1.ViewModel.CustomerMenuController">
     <children>
       <Button fx:id="cusOrderHistory" layoutX="30.0" layoutY="390.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="139.0" style="-fx-background-color: #ffffff; -fx-border-color: #cdc6bd;" text="Order History" textFill="#8a8a8a">
          <font>

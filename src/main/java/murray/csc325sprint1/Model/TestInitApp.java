@@ -41,14 +41,6 @@ public class TestInitApp extends Application {
         for(int i = 0; i < users.length; i++){
             instanceOfUserFirestore.insertUser(users[i]);
         }
-        updatedUser.setPassword("CSC325");
-        instanceOfUserFirestore.updateUserPassword(updatedUser);
-
-        instanceOfUserFirestore.deleteUser(deletedUser);
-
-        instanceOfUserFirestore.promoteToEmployee(customerToEmployee);
-
-        instanceOfUserFirestore.demoteToCustomer(employeeToCustomer);
 
         launch(args);
     }
