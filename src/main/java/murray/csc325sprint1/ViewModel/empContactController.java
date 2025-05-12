@@ -138,7 +138,9 @@ public class empContactController {
             Parent root = loader.load();
             Stage stage = (Stage) empGoBackBtn.getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.show();
+
+            stage.centerOnScreen();
+
         } catch (Exception e) {
             e.printStackTrace();
             showAlert("Error", "Failed to go back to the main screen.");
