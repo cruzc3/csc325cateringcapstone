@@ -5,7 +5,7 @@ import java.util.Objects;
 public class User {
 
     private String fName,lName,email,secQuestion,secAnswer,password;
-    private boolean employee;
+    private boolean employee, admin;
 
     public User(String fName, String lName, String email, String secQuestion, String secAnswer, String password) {
         this.fName = fName;
@@ -14,7 +14,8 @@ public class User {
         this.secQuestion = secQuestion;
         this.secAnswer = secAnswer;
         this.password = password;
-        this.employee = false; // Default to customer
+        this.employee = false;
+        this.admin = false;
     }
 
     /**
@@ -30,6 +31,46 @@ public class User {
         this.password = password;
         this.employee = isEmployee;
     }
+    //Made for the employee cards when being called at admin
+    public User(String fName, String lName, String email, Boolean employeeStatus, Boolean adminStatus){
+        this.fName = fName;
+        this.lName = lName;
+        this.email = email;
+        this.employee = employeeStatus;
+        this.admin = adminStatus;
+    }
+
+    public User(String fName, String lName, String email, String secQuestion, String secAnswer, Boolean employeeStatus) {
+        this.fName = fName;
+        this.lName = lName;
+        this.email = email;
+        this.secQuestion = secQuestion;
+        this.secAnswer = secAnswer;
+        this.employee = employeeStatus;
+        this.admin = false;
+    }
+    //----------constructor for admin-------------------\\
+    public User(String fName, String lName, String email) {
+        this.fName = fName;
+        this.lName = lName;
+        this.email = email;
+        this.secQuestion = "What class in Farmingdale did we develop this app. ex.. bcs123?";
+        this.secAnswer = "csc325";
+        this.password ="admin";
+        this.employee = true;
+        this.admin = true;
+    }
+
+    public User(String fName, String lName, String email, String secQuestion, String secAnswer,Boolean employeeStatus, Boolean adminStatus) {
+        this.fName = fName;
+        this.lName = lName;
+        this.email = email;
+        this.secQuestion = secQuestion;
+        this.secAnswer = secAnswer;
+        this.employee = employeeStatus;
+        this.admin = adminStatus;
+    }
+
 
     public String getfName() {
         return fName;
@@ -85,6 +126,14 @@ public class User {
 
     public void setEmployee(boolean employee) {
         this.employee = employee;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 
     @Override

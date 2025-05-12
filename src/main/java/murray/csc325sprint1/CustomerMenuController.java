@@ -60,9 +60,9 @@ public class CustomerMenuController implements Initializable {
             double width = stage.getScene().getRoot().prefWidth(-1);
             double height = stage.getScene().getRoot().prefHeight(-1);
 
-            stage.setWidth(width);
-            stage.setHeight(height);
-            stage.centerOnScreen();
+            stage.setWidth(778);
+            stage.setHeight(575);
+            Platform.runLater(stage::centerOnScreen);
         });
 
         // Initialize the Quote button click event
@@ -111,23 +111,13 @@ public class CustomerMenuController implements Initializable {
         // Initialize log out functionality - simply close the application
         cusLogOut.setOnAction(event -> {
             try {
-                // Clear current user session
-                Util.setCurrentUser(null);
-
-                // Get the current stage
-                Stage currentStage = (Stage) cusLogOut.getScene().getWindow();
-
-                // Show confirmation dialog
                 Alert confirmExit = new Alert(Alert.AlertType.CONFIRMATION);
-                confirmExit.setTitle("Log Out");
-                confirmExit.setHeaderText("Log Out");
-                confirmExit.setContentText("Are you sure you want to log out and exit the application?");
-
+                confirmExit.setContentText("Are you sure you want to log out?");
+                confirmExit.setHeaderText(null);
+                confirmExit.setTitle(null);
                 if (confirmExit.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
-                    // Close the application
-                    currentStage.close();
-                    // Optionally force exit the application
-                    // Platform.exit();
+                    Util.setCurrentUser(null);
+                    Platform.exit();
                 }
             } catch (Exception e) {
                 e.printStackTrace();

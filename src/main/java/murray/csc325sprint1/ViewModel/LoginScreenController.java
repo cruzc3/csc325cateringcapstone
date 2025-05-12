@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -18,6 +19,10 @@ import murray.csc325sprint1.Model.UserFirestoreFunctions;
 import murray.csc325sprint1.Model.Util;
 
 import java.io.IOException;
+import java.util.Objects;
+
+import static murray.csc325sprint1.Model.ViewPaths.CUST_MAIN;
+import static murray.csc325sprint1.Model.ViewPaths.EMP_MAIN;
 
 
 public class LoginScreenController {
@@ -47,6 +52,7 @@ public class LoginScreenController {
 
     @FXML
     public void initialize() {
+        instanceOfUserFirestore = UserFirestoreFunctions.getInstance();
         passwordTF.textProperty().bindBidirectional(passwordPF.textProperty());
         Platform.runLater(() -> {
             Stage stage = (Stage) signInGridPane.getScene().getWindow();
@@ -59,7 +65,7 @@ public class LoginScreenController {
 
             stage.setWidth(prefWidth);
             stage.setHeight(prefHeight + 20);
-            stage.centerOnScreen();     // Center the stage
+            Platform.runLater(stage::centerOnScreen);
         });
     }
 
@@ -120,25 +126,32 @@ public class LoginScreenController {
             boolean isValid = instanceOfUserFirestore.verifyLogin(email, password);
             if (isValid) {
                 loginLbl.setText("Login successful!");
+                try {
+                    Parent nextPane;
+                    User currentUser = instanceOfUserFirestore.getCurrentUser();
+                    currentUser.toString();
+                    System.out.println(currentUser.isEmployee());
 
-                // Get the user from the database
-                User user = instanceOfUserFirestore.findUser(email);
-                if (user != null) {
-                    // Store the current user for later reference
-                    Util.setCurrentUser(user);
-
-                    // Get the current stage
-                    Stage stage = (Stage) signInGridPane.getScene().getWindow();
-
-                    // Navigate to the appropriate menu based on user type
-                    Util.navigateToAppropriateMenu(stage, user);
-                } else {
-                    loginLbl.setText("User not found. Please try again.");
+                    // Check if user is an employee
+                    if (currentUser.isEmployee()) {
+                        nextPane = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(EMP_MAIN)));
+                        System.out.println("User: " + currentUser);
+                        System.out.print("Welcome valued employee");
+                    } else {
+                        nextPane = FXMLLoader.load(Objects.requireNonNull(getClass().getResource(CUST_MAIN)));
+                    }
+                    instance.clearContent();
+                    instance.initScreenBorderPane.setCenter(nextPane);
+                } catch (Exception e) {
+                    // Handle loading pane failure
+                    e.printStackTrace();
+                    loginLbl.setText("Error loading user menu: " + e.getMessage());
                 }
             } else {
                 loginLbl.setText("Invalid email or password.");
             }
         } catch (Exception e) {
+            // Handle general exceptions
             e.printStackTrace();
             loginLbl.setText("Error during login: " + e.getMessage());
         }
