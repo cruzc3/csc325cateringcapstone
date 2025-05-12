@@ -25,16 +25,10 @@ public class EmployeeMainController implements Initializable {
     private Button EmpContact;
 
     @FXML
-    private Button EmpInventory;
-
-    @FXML
     private Button EmpLogOut;
 
     @FXML
     private Button EmpOrders;
-
-    @FXML
-    private Button EmpSchedule;
 
     @FXML
     private Label welcomeLabel; // Add this if you have a welcome label
@@ -110,15 +104,6 @@ public class EmployeeMainController implements Initializable {
                 e.printStackTrace();
                 showError("Error loading orders view: " + e.getMessage());
             }
-        });
-
-        // Add additional button handlers as needed
-        EmpInventory.setOnAction(event -> {
-            showNotImplementedMessage();
-        });
-
-        EmpSchedule.setOnAction(event -> {
-            showNotImplementedMessage();
         });
     }
 
